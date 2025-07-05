@@ -1,582 +1,881 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prevalalyzer - E-commerce Analysis System</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #FFD700 0%, #FFF8DC 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border: 2px solid #FFD700;
+        }
+        .gradient-text {
+            background: linear-gradient(45deg, #FFD700, #000000);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .card-header {
+            background: linear-gradient(45deg, #FFD700, #FFA500) !important;
+            color: black !important;
+            font-weight: bold;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            border: none;
+            color: black;
+            font-weight: bold;
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #32CD32, #228B22);
+            border: none;
+            color: white;
+            font-weight: bold;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-container {
+            height: 400px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #FFD700;
+        }
+        .user-message .message-bubble {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: black;
+            padding: 12px 18px;
+            border-radius: 20px 20px 5px 20px;
+            display: inline-block;
+            max-width: 70%;
+            word-wrap: break-word;
+            font-weight: bold;
+        }
+        .system-message .message-bubble {
+            background: white;
+            color: #333;
+            padding: 12px 18px;
+            border-radius: 20px 20px 20px 5px;
+            display: inline-block;
+            max-width: 70%;
+            word-wrap: break-word;
+            border: 2px solid #FFD700;
+        }
+        .send-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            border: none;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        .chat-input-container {
+            position: relative;
+        }
+        .chat-input {
+            border-radius: 25px;
+            padding: 12px 50px 12px 20px;
+            resize: none;
+            border: 2px solid #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+    <div class="main-card p-4">
 
-{% block title %}Home - PrivAnalyzer{% endblock %}
-
-{% block content %}
-<div class="container py-5" style="background-color: white; color: black;">
-
-    <!-- Hero Section -->
-    <div class="text-center mb-5">
-        <h1 class="display-3 fw-bold gradient-text" style="color: #FFD700;">🛒 PrivAnalyzer</h1>
-        <p class="lead fs-4 text-muted">Confidential E-Commerce Data Analyzer with Auto-Masking & AI Insights</p>
-    </div>
-
-    <!-- Confidential Fields Selection (Hidden by default) -->
-    <div id="confidential-fields-section" class="card mb-5 shadow-sm" style="display: none; background-color: #f0f8ff;">
-        <div class="card-header bg-info text-white">
-            <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Select Confidential Fields</h5>
+        <!-- 🌟 HEADER SECTION -->
+        <div class="text-center mb-4">
+            <h1 class="display-4 fw-bold gradient-text mb-2">🛡️ PREVANALYZER</h1>
+            <p class="lead text-muted">E-commerce Data Analysis with Auto-Protection & AI Assistant</p>
         </div>
-        <div class="card-body">
-            <p class="text-muted mb-3">Choose which fields contain sensitive/confidential information. Privacy protection operations will only be applied to these selected fields.</p>
-            <div id="fields-checkboxes" class="row">
-                <!-- Checkboxes will be populated here -->
-            </div>
-            <div class="mt-3">
-                <button class="btn btn-info me-2" onclick="selectAllFields()">Select All</button>
-                <button class="btn btn-outline-secondary me-2" onclick="clearAllFields()">Clear All</button>
-                <button class="btn btn-success" onclick="saveConfidentialFields()">
-                    <i class="fas fa-save"></i> Save Selection
-                </button>
-            </div>
-            <div id="selection-status" class="mt-3"></div>
-        </div>
-    </div>
 
-    <!-- Features Section -->
-    <div class="row gx-4 gy-4 mb-5 justify-content-center">
-        <!-- Upload Data Card -->
-        <div class="col-md-5 col-lg-4">
-            <div class="feature-card p-4 border rounded shadow-sm h-100 d-flex flex-column" style="background-color: #f8f9fa;">
-                <div class="feature-icon fs-1 mb-3 text-warning">📤</div>
-                <h4 class="mb-3">Upload E-Commerce Data</h4>
-                <p class="flex-grow-1 text-secondary">Upload customer or staff data in Excel/CSV format. Auto-detects &amp; processes sensitive info.</p>
-
-                <form id="upload-form" enctype="multipart/form-data" class="mt-3">
-                    <input type="file" name="file" class="form-control mb-3" accept=".xlsx,.xls,.csv" required>
-                    <button type="submit" class="btn btn-warning w-100 fw-semibold">Upload File</button>
-                </form>
-
-                <div id="upload-status" class="mt-3 text-success fw-semibold"></div>
-            </div>
-        </div>
-
-        <!-- Data Privacy -->
-        <div class="col-md-5 col-lg-4">
-            <div class="feature-card p-4 border rounded shadow-sm h-100 d-flex flex-column" style="background-color: #f8f9fa;">
-                <div class="feature-icon fs-1 mb-3 text-warning">🔐</div>
-                <h4 class="mb-3">Privacy Protection</h4>
-                <p class="flex-grow-1 text-secondary">Safeguard sensitive information by automatically encrypting and masking confidential data. <span class="text-warning"><strong>Note:</strong> Select confidential fields first after uploading data.</span></p>
-                <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
-                    <button class="btn btn-warning fw-semibold" onclick="processOperation('encryption')">Encryption</button>
-                    <button class="btn btn-secondary fw-semibold" onclick="processOperation('masking')">Masking</button>
-                    <button class="btn btn-info text-white fw-semibold" onclick="processOperation('hashing')">Hashing</button>
-                    <button class="btn btn-dark fw-semibold" onclick="processOperation('tokenization')">Tokenization</button>
-                    <button class="btn btn-success fw-semibold" onclick="processOperation('apply_all')">Apply All</button>
+        <!-- 📂 FILE UPLOAD SECTION -->
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-8">
+                <div class="card border-0 shadow-sm">
+                    <!-- Upload Section Header -->
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-upload"></i> Upload Your Data</h5>
+                    </div>
+                    <!-- Upload Section Body -->
+                    <div class="card-body">
+                        <!-- File input field -->
+                        <div class="mb-3">
+                            <input type="file" id="file-input" class="form-control" accept=".xlsx,.xls,.csv" required>
+                            <div class="form-text">Supported formats: Excel (.xlsx, .xls) and CSV files</div>
+                        </div>
+                        <!-- Upload Button -->
+                        <button type="button" class="btn btn-primary w-100" id="upload-btn">
+                            <i class="fas fa-cloud-upload-alt"></i> Upload & Analyze
+                        </button>
+                        <!-- Upload status message -->
+                        <div id="upload-status" class="mt-3"></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Replace the Smart Operations card in your index.html with this enhanced version -->
-
-<div class="card mb-5 shadow-sm" style="background-color: #f8f9fa;">
-    <div class="card-header bg-warning text-dark">
-        <h5 class="mb-0"><i class="fas fa-bolt"></i> Smart Query System</h5>
-    </div>
-    <div class="card-body">
-        <!-- Quick Action Buttons -->
-        <div class="row g-3 mb-4">
-            <div class="col-md-3">
-                <button class="btn btn-outline-warning w-100 fw-semibold btn-sm" onclick="setQuery('show all entries')">
-                    <i class="fas fa-database me-1"></i> Show All
-                </button>
-            </div>
-            <div class="col-md-3">
-                <button class="btn btn-outline-info w-100 fw-semibold btn-sm" onclick="setQuery('statistics')">
-                    <i class="fas fa-chart-bar me-1"></i> Statistics
-                </button>
-            </div>
-            <div class="col-md-3">
-                <button class="btn btn-outline-success w-100 fw-semibold btn-sm" onclick="setQuery('count')">
-                    <i class="fas fa-calculator me-1"></i> Count
-                </button>
-            </div>
-            <div class="col-md-3">
-                <button class="btn btn-outline-secondary w-100 fw-semibold btn-sm" onclick="setQuery('columns')">
-                    <i class="fas fa-list me-1"></i> Columns
-                </button>
-            </div>
-        </div>
-
-        <!-- Query Input -->
-        <div class="mb-3">
-            <div class="input-group">
-                <input type="text" id="quick-query" class="form-control" 
-                       placeholder="Try: 'show all entries', 'count', 'show name', 'unique department', 'where name is john'...">
-                <button class="btn btn-warning fw-semibold" onclick="processQuickQuery()">
-                    <i class="fas fa-search me-1"></i> Query
-                </button>
-                <button class="btn btn-outline-info" onclick="showQueryExamples()" title="Show Examples">
-                    <i class="fas fa-question-circle"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- Query Examples (Initially Hidden) -->
-        <div id="query-examples" class="alert alert-info" style="display: none;">
-            <h6><i class="fas fa-lightbulb me-2"></i>Query Examples:</h6>
-            <div class="row">
-                <div class="col-md-6">
-                    <strong>Basic Queries:</strong>
-                    <ul class="list-unstyled ms-3">
-                        <li><code>show all entries</code> - Display all data</li>
-                        <li><code>count</code> - Total number of entries</li>
-                        <li><code>statistics</code> - Data analysis</li>
-                        <li><code>columns</code> - Show available columns</li>
-                    </ul>
-                </div>
-                <div class="col-md-6">
-                    <strong>Advanced Queries:</strong>
-                    <ul class="list-unstyled ms-3">
-                        <li><code>show name</code> - Display specific column</li>
-                        <li><code>unique department</code> - Unique values</li>
-                        <li><code>find manager</code> - Search for term</li>
-                        <li><code>where name is john</code> - Filter data</li>
-                    </ul>
+        <!-- 📋 COLUMN HEADERS DISPLAY SECTION -->
+        <div id="columns-section" class="row mb-4" style="display: none;">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm fade-in">
+                    <!-- Detected Columns Header -->
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-columns"></i> Detected Columns</h5>
+                    </div>
+                    <!-- Detected Columns Body -->
+                    <div class="card-body">
+                        <div id="columns-list"></div> <!-- List of columns will be populated here -->
+                    </div>
                 </div>
             </div>
-            <div id="dynamic-examples"></div>
         </div>
 
-        <!-- Query History -->
-        <div id="query-history" class="mt-3" style="display: none;">
-            <h6 class="text-muted">Recent Queries:</h6>
-            <div id="history-buttons" class="d-flex flex-wrap gap-1"></div>
+        <!-- 🔐 CONFIDENTIAL FIELD PROTECTION SECTION -->
+        <div id="confidential-section" class="row mb-4" style="display: none;">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm fade-in">
+                    <!-- Confidential Fields Header -->
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Select Protection Techniques</h5>
+                    </div>
+                    <!-- Confidential Fields Body -->
+                    <div class="card-body">
+                        <p class="mb-3">Select protection techniques for confidential fields:</p>
+                        <div id="confidential-list"></div> <!-- Checkboxes or field list rendered dynamically -->
+                        <div class="text-center mt-3">
+                            <!-- Apply Protection Button -->
+                            <button class="btn btn-success" id="apply-protection-btn">
+                                Apply Selected Protections
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📊 PROTECTED DATA PREVIEW SECTION -->
+        <div id="results-section" class="row mb-4" style="display: none;">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm fade-in">
+                    <!-- Protected Data Header -->
+                    <div class="card-header" style="background: #000000 !important; color: white !important;">
+                        <h5 class="mb-0"><i class="fas fa-table"></i> Protected Data Sample</h5>
+                    </div>
+                    <!-- Protected Data Body -->
+                    <div class="card-body">
+                        <div id="results-content"></div> <!-- Table preview of protected data -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 🤖 AI CHAT ASSISTANT SECTION -->
+        <div id="chat-section" class="row mb-4" style="display: none;">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm fade-in">
+                    <!-- Chat Assistant Header -->
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-robot"></i> AI Data Assistant</h5>
+                    </div>
+                    <!-- Chat Assistant Body -->
+                    <div class="card-body">
+                        <!-- Initial system message -->
+                        <div id="chat-container" class="chat-container mb-3">
+                            <div class="chat-message system-message">
+                                <div class="message-bubble">
+                                    <i class="fas fa-robot me-2"></i>
+                                    Hello! Ask me about your data: "How many records?", "Show statistics", "Which fields are protected?"
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Chat input and send button -->
+                        <div class="chat-input-container">
+                            <textarea id="chat-input" class="form-control chat-input" placeholder="Ask me anything about your data..." rows="2"></textarea>
+                            <button id="send-btn" class="send-btn" type="button">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-<script>
-// Enhanced query system JavaScript functions
-let queryHistory = [];
-
-// Set query in input field
-function setQuery(query) {
-    document.getElementById('quick-query').value = query;
-    document.getElementById('quick-query').focus();
-}
-
-// Show/hide query examples
-function showQueryExamples() {
-    const examplesDiv = document.getElementById('query-examples');
-    if (examplesDiv.style.display === 'none') {
-        examplesDiv.style.display = 'block';
-        loadDynamicExamples();
-    } else {
-        examplesDiv.style.display = 'none';
-    }
-}
-
-// Load dynamic examples based on available data
-function loadDynamicExamples() {
-    fetch('/query-help')
-    .then(response => response.json())
-    .then(data => {
-        if (data.success && data.columns) {
-            const dynamicDiv = document.getElementById('dynamic-examples');
-            let content = '<div class="mt-3"><strong>Based on your data:</strong><ul class="list-unstyled ms-3">';
-            
-            // Show first few columns as examples
-            data.columns.slice(0, 5).forEach(col => {
-                content += `<li><button class="btn btn-link btn-sm p-0 text-start" onclick="setQuery('show ${col}')">${col}</button> - Show this column</li>`;
-            });
-            
-            content += '</ul></div>';
-            dynamicDiv.innerHTML = content;
-        }
-    })
-    .catch(error => console.error('Error loading examples:', error));
-}
-
-// Enhanced query processing with history
-function processQuickQuery() {
-    const query = document.getElementById("quick-query").value.trim();
-    if (!query) {
-        alert("Please enter a query first.");
-        return;
-    }
-    
-    // Add to history
-    addToQueryHistory(query);
-    
-    showLoading(`Processing query: "${query}"`);
-    
-    fetch('/query', {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json' 
-        },
-        body: JSON.stringify({ query: query })
-    })
-    .then(response => response.json())
-    .then(data => {
-        displayResults(data, `Query: "${query}"`);
-        
-        // Hide examples after successful query
-        document.getElementById('query-examples').style.display = 'none';
-    })
-    .catch(error => {
-        displayResults({error: "Network error: " + error.message}, "Error");
-    });
-}
-
-// Add query to history
-function addToQueryHistory(query) {
-    if (!queryHistory.includes(query)) {
-        queryHistory.unshift(query);
-        if (queryHistory.length > 5) {
-            queryHistory = queryHistory.slice(0, 5); // Keep only last 5
-        }
-        updateQueryHistoryDisplay();
-    }
-}
-
-// Update query history display
-function updateQueryHistoryDisplay() {
-    if (queryHistory.length > 0) {
-        const historyDiv = document.getElementById('query-history');
-        const buttonsDiv = document.getElementById('history-buttons');
-        
-        buttonsDiv.innerHTML = '';
-        queryHistory.forEach(query => {
-            const btn = document.createElement('button');
-            btn.className = 'btn btn-outline-secondary btn-sm';
-            btn.textContent = query.length > 20 ? query.substring(0, 20) + '...' : query;
-            btn.title = query;
-            btn.onclick = () => setQuery(query);
-            buttonsDiv.appendChild(btn);
-        });
-        
-        historyDiv.style.display = 'block';
-    }
-}
-
-// Enhanced keyboard support
-document.getElementById('quick-query').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        processQuickQuery();
-    }
-});
-
-// Auto-suggestions (optional enhancement)
-document.getElementById('quick-query').addEventListener('input', function(e) {
-    const value = e.target.value.toLowerCase();
-    
-    // Simple auto-suggestions
-    const suggestions = [
-        'show all entries',
-        'count',
-        'statistics',
-        'columns',
-        'show ',
-        'unique ',
-        'find ',
-        'where '
-    ];
-    
-    // You can expand this to show a dropdown with suggestions
-    // For now, just update placeholder with relevant suggestion
-    const matchingSuggestion = suggestions.find(s => s.startsWith(value) && value.length > 2);
-    if (matchingSuggestion && value !== matchingSuggestion) {
-        // You could implement autocomplete dropdown here
-    }
-});
-</script>
-
-
-
-    <!-- Results Section -->
-    <div id="results-section" class="card mb-5 shadow-sm" style="display: none; background-color: #f8f9fa;">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0" id="results-title"><i class="fas fa-list"></i> Results</h5>
-        </div>
-        <div class="card-body" id="results-content">
-            <div class="text-center text-muted">
-                <p>Results will appear here...</p>
-            </div>
-        </div>
     </div>
 
-    
-</div>
-{% endblock %}
+    <script>
+        let uploadedData = [];
+        let originalData = [];
+        let detectedColumns = [];
+        let confidentialFields = [];
+        let protectionTechniques = {};
 
-{% block scripts %}
-<script>
-    // Global variables
-    let availableColumns = [];
-    let confidentialFields = [];
+        // Fixed upload button handler
+        document.getElementById('upload-btn').addEventListener('click', function () {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
 
-    // Show/hide confidential fields selection
-    function showConfidentialFieldsSelection(columns) {
-        availableColumns = columns;
-        const section = document.getElementById('confidential-fields-section');
-        const checkboxContainer = document.getElementById('fields-checkboxes');
-        
-        // Clear existing checkboxes
-        checkboxContainer.innerHTML = '';
-        
-        // Create checkboxes for each column
-        columns.forEach(column => {
-            const colDiv = document.createElement('div');
-            colDiv.className = 'col-md-4 col-sm-6 mb-2';
-            
-            colDiv.innerHTML = `
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="${column}" id="field_${column}">
-                    <label class="form-check-label" for="field_${column}">
-                        <strong>${column}</strong>
-                    </label>
-                </div>
-            `;
-            
-            checkboxContainer.appendChild(colDiv);
-        });
-        
-        // Show the section
-        section.style.display = 'block';
-        
-        // Scroll to the section
-        section.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Select all fields
-    function selectAllFields() {
-        const checkboxes = document.querySelectorAll('#fields-checkboxes input[type="checkbox"]');
-        checkboxes.forEach(checkbox => checkbox.checked = true);
-    }
-
-    // Clear all fields
-    function clearAllFields() {
-        const checkboxes = document.querySelectorAll('#fields-checkboxes input[type="checkbox"]');
-        checkboxes.forEach(checkbox => checkbox.checked = false);
-    }
-
-    // Save confidential fields selection
-    function saveConfidentialFields() {
-        const checkboxes = document.querySelectorAll('#fields-checkboxes input[type="checkbox"]:checked');
-        confidentialFields = Array.from(checkboxes).map(cb => cb.value);
-        
-        const statusDiv = document.getElementById('selection-status');
-        
-        if (confidentialFields.length === 0) {
-            statusDiv.innerHTML = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> No fields selected. Privacy operations will not work.</div>';
-            return;
-        }
-        
-        // Send to backend
-        fetch('/set-confidential-fields', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fields: confidentialFields })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                statusDiv.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle"></i> ${data.message}</div>`;
-            } else {
-                statusDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ${data.error}</div>`;
+            if (!file) {
+                showStatus('Please select a file first!', 'warning');
+                return;
             }
-        })
-        .catch(error => {
-            statusDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}</div>`;
-        });
-    }
 
-    // Helper function to show loading state
-    function showLoading(message = "Processing...") {
-        const resultSection = document.getElementById("results-section");
-        const resultContent = document.getElementById("results-content");
-        const resultTitle = document.getElementById("results-title");
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+            this.disabled = true;
 
-        resultSection.style.display = "block";
-        resultTitle.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${message}`;
-        resultContent.innerHTML = `<div class="text-center"><div class="spinner-border text-warning" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
-    }
+            const formData = new FormData();
+            formData.append('file', file);
 
-    // Helper function to display results
-    function displayResults(data, title = "Results") {
-        const resultSection = document.getElementById("results-section");
-        const resultContent = document.getElementById("results-content");
-        const resultTitle = document.getElementById("results-title");
-
-        resultSection.style.display = "block";
-        resultTitle.innerHTML = `<i class="fas fa-check-circle"></i> ${title}`;
-        
-        if (data.error) {
-            resultContent.innerHTML = `<div class="alert alert-danger"><strong>Error:</strong> ${data.error}</div>`;
-        } else if (data.table) {
-            let content = `<div class="alert alert-success mb-3">${data.message || 'Operation completed successfully'}</div>`;
-            content += data.table;
-            if (data.rows_processed) {
-                content += `<div class="mt-2 text-muted"><small>Rows processed: ${data.rows_processed}</small></div>`;
-            }
-            if (data.confidential_fields_processed) {
-                content += `<div class="mt-2 text-info"><small><i class="fas fa-shield-alt"></i> Confidential fields processed: ${data.confidential_fields_processed.join(', ')}</small></div>`;
-            }
-            resultContent.innerHTML = content;
-        } else if (data.statistics) {
-            let content = `<div class="alert alert-info mb-3">${data.message || 'Statistics generated'}</div>`;
-            content += '<div class="row">';
-            
-            Object.keys(data.statistics).forEach(key => {
-                const stat = data.statistics[key];
-                content += '<div class="col-md-6 mb-3">';
-                content += `<div class="card"><div class="card-body">`;
-                content += `<h6 class="card-title">${key}</h6>`;
-                
-                if (typeof stat === 'object') {
-                    Object.keys(stat).forEach(subKey => {
-                        content += `<p class="card-text mb-1"><strong>${subKey.replace('_', ' ')}:</strong> ${stat[subKey]}</p>`;
-                    });
-                } else {
-                    content += `<p class="card-text">${stat}</p>`;
-                }
-                
-                content += `</div></div></div>`;
-            });
-            
-            content += '</div>';
-            resultContent.innerHTML = content;
-        } else if (data.message) {
-            resultContent.innerHTML = `<div class="alert alert-info">${data.message}</div>`;
-        } else {
-            resultContent.innerHTML = `<pre class="bg-light p-3 rounded">${JSON.stringify(data, null, 2)}</pre>`;
-        }
-    }
-
-    // Privacy Protection Operations
-    function processOperation(type) {
-        showLoading(`Applying ${type}...`);
-        
-        fetch(`/process/${type}`, { 
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => displayResults(data, `${type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')} Result`))
-        .catch(error => {
-            displayResults({error: "Network error: " + error.message}, "Error");
-        });
-    }
-
-    // Show All Data
-    function showAllData() {
-        showLoading("Loading all data...");
-        
-        fetch('/show-all')
-        .then(response => response.json())
-        .then(data => displayResults(data, "All Data Entries"))
-        .catch(error => {
-            displayResults({error: "Network error: " + error.message}, "Error");
-        });
-    }
-
-    // Get Statistics
-    function getStatistics() {
-        showLoading("Generating insights...");
-        
-        fetch('/statistics')
-        .then(response => response.json())
-        .then(data => displayResults(data, "Data Insights"))
-        .catch(error => {
-            displayResults({error: "Network error: " + error.message}, "Error");
-        });
-    }
-
-    // Process Quick Query
-    function processQuickQuery() {
-        const query = document.getElementById("quick-query").value.trim();
-        if (!query) {
-            alert("Please enter a query first.");
-            return;
-        }
-        
-        showLoading(`Processing query: "${query}"`);
-        
-        fetch('/query', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify({ query: query })
-        })
-        .then(response => response.json())
-        .then(data => displayResults(data, `Query: "${query}"`))
-        .catch(error => {
-            displayResults({error: "Network error: " + error.message}, "Error");
-        });
-    }
-
-    // Handle file upload
-    document.getElementById('upload-form').addEventListener('submit', function (e) {
-        e.preventDefault();
-        
-        const formData = new FormData(this);
-        const uploadStatus = document.getElementById('upload-status');
-        
-        // Show loading
-        uploadStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading file...';
-        uploadStatus.className = 'mt-3 text-info fw-semibold';
-        
-        fetch('/upload', {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                uploadStatus.innerHTML = '<i class="fas fa-check-circle"></i> File uploaded successfully!';
-                uploadStatus.className = 'mt-3 text-success fw-semibold';
-                
-                // Display upload results
-                let content = `<div class="alert alert-success mb-3">File uploaded and processed successfully!</div>`;
-                content += data.table;
-                
-                if (data.insights && data.insights.length > 0) {
-                    content += '<h5 class="mt-4">Automatic Insights:</h5>';
-                    content += '<div class="row">';
-                    data.insights.forEach(insight => {
-                        content += `<div class="col-md-6 mb-2"><div class="alert alert-info py-2">${insight}</div></div>`;
-                    });
-                    content += '</div>';
-                }
-                
-                displayResults({
-                    table: content,
-                    message: "File processed successfully"
-                }, "Upload Results");
-                
-                // Get columns and show confidential fields selection
-                fetch('/get-columns')
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
                 .then(response => response.json())
-                .then(columnData => {
-                    if (columnData.columns) {
-                        showConfidentialFieldsSelection(columnData.columns);
-                    }
-                })
-                .catch(error => console.error('Error getting columns:', error));
-                
-                // Reset form
-                this.reset();
-            } else {
-                uploadStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.message}`;
-                uploadStatus.className = 'mt-3 text-danger fw-semibold';
-            }
-        })
-        .catch(error => {
-            uploadStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Upload failed: ${error.message}`;
-            uploadStatus.className = 'mt-3 text-danger fw-semibold';
-        });
-    });
+                .then(data => {
+                    if (data.success) {
+                        uploadedData = data.preview_data || [];
+                        originalData = JSON.parse(JSON.stringify(uploadedData));
+                        detectedColumns = data.columns || [];
 
-    // Allow Enter key for quick query
-    document.getElementById('quick-query').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            processQuickQuery();
+                        showStatus(data.message, 'success');
+                        showColumns();
+                        detectConfidentialFields(); // Optional: if you use auto-detection
+                        document.getElementById('columns-section').style.display = 'block';
+                    } else {
+                        showStatus(data.message || 'Upload failed.', 'danger');
+                    }
+                    resetUploadButton();
+                })
+                .catch(error => {
+                    console.error('Upload error:', error);
+                    showStatus('Upload failed. Please try again.', 'danger');
+                    resetUploadButton();
+                });
+        });
+
+
+        function showColumns() {
+            const section = document.getElementById('columns-section');
+            const list = document.getElementById('columns-list');
+            
+            list.innerHTML = detectedColumns.map(col => 
+                `<span class="badge bg-warning text-dark me-2 mb-2">${col}</span>`
+            ).join('');
+            
+            section.style.display = 'block';
         }
-    });
-</script>
-{% endblock %}
+
+        function detectConfidentialFields() {
+            const confidentialPatterns = {
+                email: /email|e_mail|mail/i,
+                phone: /phone|mobile|tel|contact/i,
+                ssn: /ssn|social_security|aadhar/i,
+                credit_card: /credit_card|card_number/i,
+                address: /address|street|location/i,
+                id: /id$|user_id|customer_id/i,
+                password: /password|pwd/i
+            };
+
+            confidentialFields = [];
+            
+            detectedColumns.forEach(column => {
+                for (const [type, pattern] of Object.entries(confidentialPatterns)) {
+                    if (pattern.test(column)) {
+                        confidentialFields.push(column);
+                        break;
+                    }
+                }
+            });
+
+            if (confidentialFields.length > 0) {
+                showProtectionDropdowns();
+            } else {
+                // No confidential fields, show results directly
+                showResults();
+                showChatSection();
+            }
+        }
+
+        function showProtectionDropdowns() {
+            const section = document.getElementById('confidential-section');
+            const list = document.getElementById('confidential-list');
+
+            list.innerHTML = confidentialFields.map(field => {
+                return `
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">${field}</label>
+                        <select class="form-select" id="technique-${field}">
+                            <option value="Masking">Masking</option>
+                            <option value="Hashing">Hashing</option>
+                            <option value="Encryption">Encryption</option>
+                            <option value="Tokenization">Tokenization</option>
+                        </select>
+                    </div>`;
+            }).join('');
+
+            // Add event listener to apply button
+            document.getElementById('apply-protection-btn').addEventListener('click', applySelectedProtections);
+
+            section.style.display = 'block';
+        }
+
+        function applySelectedProtections() {
+            // Get selected techniques
+            confidentialFields.forEach(field => {
+                const select = document.getElementById(`technique-${field}`);
+                protectionTechniques[field] = select.value;
+            });
+
+            // Apply protections
+            protectData();
+            showResults();
+            showChatSection();
+        }
+
+        function protectData() {
+            uploadedData.forEach(row => {
+                Object.keys(row).forEach(key => {
+                    if (confidentialFields.includes(key) && row[key]) {
+                        const technique = protectionTechniques[key];
+                        switch (technique) {
+                            case 'Masking':
+                                row[key] = maskData(row[key]);
+                                break;
+                            case 'Hashing':
+                                row[key] = hashData(row[key]);
+                                break;
+                            case 'Encryption':
+                                row[key] = encryptData(row[key]);
+                                break;
+                            case 'Tokenization':
+                                row[key] = tokenizeData(row[key]);
+                                break;
+                        }
+                    }
+                });
+            });
+        }
+
+        function maskData(value) {
+            const str = value.toString();
+            if (str.includes('@')) {
+                const [username, domain] = str.split('@');
+                return username.substring(0, 2) + '***@' + domain;
+            }
+            return str.substring(0, 2) + '*'.repeat(Math.max(0, str.length - 2));
+        }
+
+        function hashData(value) {
+            return CryptoJS.SHA256(value.toString()).toString().substring(0, 16) + '...';
+        }
+
+        function encryptData(value) {
+            return `ENC_${Math.random().toString(36).substring(2, 15)}`;
+        }
+
+        function tokenizeData(value) {
+            return `TOKEN_${Math.random().toString(36).substring(2, 15)}`;
+        }
+
+        function showResults() {
+            const section = document.getElementById('results-section');
+            const content = document.getElementById('results-content');
+
+            if (uploadedData.length === 0) {
+                content.innerHTML = '<p class="text-muted">No data to display</p>';
+            } else {
+                let tableHTML = '<div class="table-responsive"><table class="table table-striped">';
+                
+                // Headers
+                tableHTML += '<thead class="table-warning"><tr>';
+                detectedColumns.forEach(col => {
+                    const isConfidential = confidentialFields.includes(col);
+                    const technique = protectionTechniques[col] || '';
+                    tableHTML += `<th>${col} ${isConfidential ? `<span class="badge bg-dark ms-1">${technique}</span>` : ''}</th>`;
+                });
+                tableHTML += '</tr></thead>';
+
+                // Data rows (first 10)
+                tableHTML += '<tbody>';
+                uploadedData.slice(0, 10).forEach(row => {
+                    tableHTML += '<tr>';
+                    detectedColumns.forEach(col => {
+                        tableHTML += `<td>${row[col] || ''}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                });
+                tableHTML += '</tbody></table></div>';
+
+                content.innerHTML = tableHTML;
+            }
+
+            section.style.display = 'block';
+        }
+
+        function showChatSection() {
+            document.getElementById('chat-section').style.display = 'block';
+            setupChatHandlers();
+        }
+
+        function setupChatHandlers() {
+            const sendBtn = document.getElementById('send-btn');
+            const chatInput = document.getElementById('chat-input');
+
+            sendBtn.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+
+        function sendMessage() {
+            const chatInput = document.getElementById('chat-input');
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+
+            addMessageToChat(message, 'user');
+            chatInput.value = '';
+
+            setTimeout(() => {
+                const response = processQuery(message);
+                addMessageToChat(response, 'system');
+            }, 500);
+        }
+
+        function addMessageToChat(message, sender) {
+            const chatContainer = document.getElementById('chat-container');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `chat-message ${sender}-message`;
+            
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+            bubbleDiv.innerHTML = sender === 'system' ? `<i class="fas fa-robot me-2"></i>${message}` : message;
+            
+            messageDiv.appendChild(bubbleDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function processQuery(query) {
+            const lowerQuery = query.toLowerCase();
+
+            try {
+                // Basic info queries
+                if (lowerQuery.includes('how many') && (lowerQuery.includes('record') || lowerQuery.includes('row'))) {
+                    return `Your dataset contains <strong>${originalData.length}</strong> records.`;
+                }
+
+                if (lowerQuery.includes('column') && !lowerQuery.includes('show')) {
+                    return `Your dataset has <strong>${detectedColumns.length}</strong> columns: ${detectedColumns.join(', ')}`;
+                }
+
+                // Statistics queries
+                if (lowerQuery.includes('statistic') || lowerQuery.includes('summary')) {
+                    return generateStatistics();
+                }
+
+                // Highest/Lowest queries
+                if (lowerQuery.includes('highest') || lowerQuery.includes('maximum') || lowerQuery.includes('max')) {
+                    return findExtreme(query, 'max');
+                }
+
+                if (lowerQuery.includes('lowest') || lowerQuery.includes('minimum') || lowerQuery.includes('min')) {
+                    return findExtreme(query, 'min');
+                }
+
+                // Average queries
+                if (lowerQuery.includes('average') || lowerQuery.includes('avg') || lowerQuery.includes('mean')) {
+                    return calculateAverage(query);
+                }
+
+                // Specific person queries (e.g., "salary of john", "email of john")
+                if (lowerQuery.includes(' of ') && !lowerQuery.includes('number of')) {
+                    return findPersonData(query);
+                }
+
+                // Show/Display queries
+                if (lowerQuery.includes('show') || lowerQuery.includes('display') || lowerQuery.includes('list')) {
+                    return handleShowQuery(query);
+                }
+
+                // Count/Number queries
+                if (lowerQuery.includes('count') || lowerQuery.includes('number of')) {
+                    return handleCountQuery(query);
+                }
+
+                // Search queries
+                if (lowerQuery.includes('find') || lowerQuery.includes('search') || lowerQuery.includes('who')) {
+                    return handleSearchQuery(query);
+                }
+
+                // Protected fields info
+                if (lowerQuery.includes('protected') || lowerQuery.includes('confidential')) {
+                    if (confidentialFields.length === 0) {
+                        return "No confidential fields were detected.";
+                    }
+                    const info = confidentialFields.map(field => 
+                        `• <strong>${field}</strong> - ${protectionTechniques[field] || 'Not protected'}`
+                    ).join('<br>');
+                    return `Protected fields:<br><br>${info}`;
+                }
+
+                // Help query
+                if (lowerQuery.includes('help')) {
+                    return getHelpMessage();
+                }
+
+                // Fallback - try to find column matches and provide data
+                return handleGenericQuery(query);
+
+            } catch (error) {
+                return "I encountered an error processing your query. Please try rephrasing your question.";
+            }
+        }
+
+        function generateStatistics() {
+            let stats = `<strong>📊 Dataset Statistics</strong><br><br>`;
+            stats += `• Total Records: <strong>${originalData.length}</strong><br>`;
+            stats += `• Total Columns: <strong>${detectedColumns.length}</strong><br>`;
+            stats += `• Protected Fields: <strong>${confidentialFields.length}</strong><br><br>`;
+
+            // Numerical statistics
+            const numericalColumns = findNumericalColumns();
+            if (numericalColumns.length > 0) {
+                stats += `<strong>📈 Numerical Analysis:</strong><br>`;
+                numericalColumns.slice(0, 5).forEach(col => {
+                    const values = getNumericValues(col);
+                    if (values.length > 0) {
+                        const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
+                        const min = Math.min(...values);
+                        const max = Math.max(...values);
+                        stats += `• <strong>${col}</strong>: Avg: ${avg}, Min: ${min}, Max: ${max}<br>`;
+                    }
+                });
+            }
+
+            // Text column analysis
+            const textColumns = detectedColumns.filter(col => !numericalColumns.includes(col));
+            if (textColumns.length > 0) {
+                stats += `<br><strong>📝 Text Columns:</strong><br>`;
+                textColumns.slice(0, 3).forEach(col => {
+                    const uniqueCount = getUniqueValues(col).length;
+                    stats += `• <strong>${col}</strong>: ${uniqueCount} unique values<br>`;
+                });
+            }
+
+            return stats;
+        }
+
+        function findExtreme(query, type) {
+            const column = extractColumnFromQuery(query);
+            if (!column) {
+                return "Please specify which column you want to find the " + type + " value for. Available columns: " + detectedColumns.join(', ');
+            }
+
+            const values = getNumericValues(column);
+            if (values.length === 0) {
+                return `Column "${column}" doesn't contain numerical data for ${type} calculation.`;
+            }
+
+            const extremeValue = type === 'max' ? Math.max(...values) : Math.min(...values);
+            const record = originalData.find(row => parseFloat(row[column]) === extremeValue);
+
+            if (record) {
+                let result = `<strong>${type === 'max' ? 'Highest' : 'Lowest'} ${column}:</strong> ${extremeValue}<br><br>`;
+                result += `<strong>Record Details:</strong><br>`;
+                detectedColumns.forEach(col => {
+                    if (record[col]) {
+                        result += `• <strong>${col}:</strong> ${record[col]}<br>`;
+                    }
+                });
+                return result;
+            }
+
+            return `${type === 'max' ? 'Highest' : 'Lowest'} ${column}: ${extremeValue}`;
+        }
+
+        function calculateAverage(query) {
+            const column = extractColumnFromQuery(query);
+            if (!column) {
+                return "Please specify which column you want to calculate average for. Available numerical columns: " + findNumericalColumns().join(', ');
+            }
+
+            const values = getNumericValues(column);
+            if (values.length === 0) {
+                return `Column "${column}" doesn't contain numerical data for average calculation.`;
+            }
+
+            const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
+            return `<strong>Average ${column}:</strong> ${avg} (based on ${values.length} records)`;
+        }
+
+        function findPersonData(query) {
+            const parts = query.toLowerCase().split(' of ');
+            if (parts.length < 2) return "Please specify what information you want and for whom (e.g., 'salary of john').";
+
+            const attribute = parts[0].trim();
+            const person = parts[1].trim();
+
+            // Find matching column for attribute
+            const attributeColumn = detectedColumns.find(col => 
+                col.toLowerCase().includes(attribute) || attribute.includes(col.toLowerCase())
+            );
+
+            if (!attributeColumn) {
+                return `Couldn't find column for "${attribute}". Available columns: ${detectedColumns.join(', ')}`;
+            }
+
+            // Find matching records for person
+            const matchingRecords = originalData.filter(row => 
+                Object.values(row).some(value => 
+                    value && value.toString().toLowerCase().includes(person)
+                )
+            );
+
+            if (matchingRecords.length === 0) {
+                return `No records found for "${person}".`;
+            }
+
+            if (matchingRecords.length === 1) {
+                const value = matchingRecords[0][attributeColumn];
+                return `<strong>${attributeColumn} of ${person}:</strong> ${value || 'Not available'}`;
+            } else {
+                let result = `Found ${matchingRecords.length} records matching "${person}":<br><br>`;
+                matchingRecords.forEach((record, index) => {
+                    const nameField = findNameField(record);
+                    const identifier = nameField ? record[nameField] : `Record ${index + 1}`;
+                    result += `• <strong>${identifier}:</strong> ${record[attributeColumn] || 'N/A'}<br>`;
+                });
+                return result;
+            }
+        }
+
+        function handleShowQuery(query) {
+            const lowerQuery = query.toLowerCase();
+
+            if (lowerQuery.includes('all') || lowerQuery.includes('data')) {
+                return displayAllData();
+            }
+
+            if (lowerQuery.includes('column')) {
+                return `Dataset columns:<br><br>${detectedColumns.map(col => `• ${col}`).join('<br>')}`;
+            }
+
+            // Try to find specific column to show
+            const column = extractColumnFromQuery(query);
+            if (column) {
+                return displayColumnData(column);
+            }
+
+            return "What would you like me to show? Try: 'show all data', 'show columns', or 'show [column name]'";
+        }
+
+        function handleCountQuery(query) {
+            const column = extractColumnFromQuery(query);
+            if (column) {
+                const uniqueValues = getUniqueValues(column);
+                return `<strong>${column}</strong> has <strong>${uniqueValues.length}</strong> unique values.`;
+            }
+
+            return `Total records: <strong>${originalData.length}</strong>`;
+        }
+
+        function handleSearchQuery(query) {
+            const searchTerms = extractSearchTerms(query);
+            if (!searchTerms) {
+                return "Please specify what you're looking for (e.g., 'find john', 'search for manager').";
+            }
+
+            const results = originalData.filter(row => 
+                Object.values(row).some(value => 
+                    value && value.toString().toLowerCase().includes(searchTerms.toLowerCase())
+                )
+            );
+
+            if (results.length === 0) {
+                return `No records found matching "${searchTerms}".`;
+            }
+
+            let response = `Found <strong>${results.length}</strong> record(s) matching "${searchTerms}":<br><br>`;
+            results.slice(0, 5).forEach((record, index) => {
+                const nameField = findNameField(record);
+                const identifier = nameField ? record[nameField] : `Record ${index + 1}`;
+                response += `<strong>${identifier}:</strong><br>`;
+                Object.keys(record).forEach(key => {
+                    if (record[key]) {
+                        response += `&nbsp;&nbsp;• ${key}: ${record[key]}<br>`;
+                    }
+                });
+                response += '<br>';
+            });
+
+            if (results.length > 5) {
+                response += `...and ${results.length - 5} more records.`;
+            }
+
+            return response;
+        }
+
+        function handleGenericQuery(query) {
+            // Try to match column names in the query
+            const matchingColumns = detectedColumns.filter(col => 
+                query.toLowerCase().includes(col.toLowerCase())
+            );
+
+            if (matchingColumns.length > 0) {
+                return displayColumnData(matchingColumns[0]);
+            }
+
+            return `I'm not sure how to help with that. Try asking about:<br>
+            • Statistics: "show statistics"<br>
+            • Specific values: "highest salary", "average age"<br>
+            • Person info: "salary of john", "email of mary"<br>
+            • Search: "find manager", "who has gmail"<br>
+            • Data display: "show all data", "show columns"`;
+        }
+
+        // Helper functions
+        function findNumericalColumns() {
+            return detectedColumns.filter(col => {
+                const values = getNumericValues(col);
+                return values.length > 0;
+            });
+        }
+
+        function getNumericValues(column) {
+            return originalData
+                .map(row => parseFloat(row[column]))
+                .filter(val => !isNaN(val));
+        }
+
+        function getUniqueValues(column) {
+            return [...new Set(originalData.map(row => row[column]).filter(v => v))];
+        }
+
+        function extractColumnFromQuery(query) {
+            const words = query.toLowerCase().split(/\s+/);
+            return detectedColumns.find(col => 
+                words.some(word => col.toLowerCase().includes(word) || word.includes(col.toLowerCase()))
+            );
+        }
+
+        function extractSearchTerms(query) {
+            const patterns = [
+                /find (.+)/i,
+                /search (?:for )?(.+)/i,
+                /who (.+)/i,
+                /show me (.+)/i
+            ];
+
+            for (const pattern of patterns) {
+                const match = query.match(pattern);
+                if (match) return match[1].trim();
+            }
+
+            return null;
+        }
+
+        function findNameField(record) {
+            const nameFields = ['name', 'full_name', 'firstname', 'first_name', 'employee_name', 'customer_name'];
+            return detectedColumns.find(col => 
+                nameFields.some(field => col.toLowerCase().includes(field)) && record[col]
+            );
+        }
+
+        function displayColumnData(column) {
+            const values = getUniqueValues(column);
+            if (values.length > 10) {
+                return `<strong>${column}</strong> has ${values.length} unique values. First 10:<br><br>${values.slice(0, 10).map(val => `• ${val}`).join('<br>')}<br><br>...and ${values.length - 10} more.`;
+            } else {
+                return `<strong>${column}</strong> values:<br><br>${values.map(val => `• ${val}`).join('<br>')}`;
+            }
+        }
+
+        function displayAllData() {
+            if (originalData.length > 10) {
+                return `Dataset is too large to display completely (${originalData.length} records). Showing first 10 records:<br><br>` + 
+                       formatRecordsForDisplay(originalData.slice(0, 10));
+            } else {
+                return `Complete dataset (${originalData.length} records):<br><br>` + 
+                       formatRecordsForDisplay(originalData);
+            }
+        }
+
+        function formatRecordsForDisplay(records) {
+            return records.map((record, index) => {
+                let formatted = `<strong>Record ${index + 1}:</strong><br>`;
+                Object.keys(record).forEach(key => {
+                    if (record[key]) {
+                        formatted += `&nbsp;&nbsp;• ${key}: ${record[key]}<br>`;
+                    }
+                });
+                return formatted;
+            }).join('<br>');
+        }
+
+        function getHelpMessage() {
+            return `<strong>🤖 I can help you analyze your data!</strong><br><br>
+            <strong>📊 Statistics & Analysis:</strong><br>
+            • "Show statistics" - Complete data overview<br>
+            • "Highest salary" / "Lowest price" - Find extremes<br>
+            • "Average age" / "Mean salary" - Calculate averages<br><br>
+            
+            <strong>🔍 Search & Find:</strong><br>
+            • "Find john" / "Search manager" - Find specific records<br>
+            • "Salary of john" / "Email of mary" - Get specific person data<br>
+            • "Who has gmail" / "Find developers" - Pattern matching<br><br>
+            
+            <strong>📋 Data Display:</strong><br>
+            • "Show all data" - Display records<br>
+            • "Show columns" - List all columns<br>
+            • "Count unique values in department" - Count analysis<br><br>
+            
+            <strong>🛡️ Protection Info:</strong><br>
+            • "Which fields are protected?" - Security overview`;
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('upload-status');
+            status.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+
+        function resetUploadButton() {
+            const btn = document.getElementById('upload-btn');
+            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload & Analyze';
+            btn.disabled = false;
+        }
+    </script>
+</body>
+</html>
