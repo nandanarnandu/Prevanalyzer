@@ -1,0 +1,582 @@
+{% extends "base.html" %}
+
+{% block title %}Home - PrivAnalyzer{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="background-color: white; color: black;">
+
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+        <h1 class="display-3 fw-bold gradient-text" style="color: #FFD700;">🛒 PrivAnalyzer</h1>
+        <p class="lead fs-4 text-muted">Confidential E-Commerce Data Analyzer with Auto-Masking & AI Insights</p>
+    </div>
+
+    <!-- Confidential Fields Selection (Hidden by default) -->
+    <div id="confidential-fields-section" class="card mb-5 shadow-sm" style="display: none; background-color: #f0f8ff;">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-shield-alt"></i> Select Confidential Fields</h5>
+        </div>
+        <div class="card-body">
+            <p class="text-muted mb-3">Choose which fields contain sensitive/confidential information. Privacy protection operations will only be applied to these selected fields.</p>
+            <div id="fields-checkboxes" class="row">
+                <!-- Checkboxes will be populated here -->
+            </div>
+            <div class="mt-3">
+                <button class="btn btn-info me-2" onclick="selectAllFields()">Select All</button>
+                <button class="btn btn-outline-secondary me-2" onclick="clearAllFields()">Clear All</button>
+                <button class="btn btn-success" onclick="saveConfidentialFields()">
+                    <i class="fas fa-save"></i> Save Selection
+                </button>
+            </div>
+            <div id="selection-status" class="mt-3"></div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row gx-4 gy-4 mb-5 justify-content-center">
+        <!-- Upload Data Card -->
+        <div class="col-md-5 col-lg-4">
+            <div class="feature-card p-4 border rounded shadow-sm h-100 d-flex flex-column" style="background-color: #f8f9fa;">
+                <div class="feature-icon fs-1 mb-3 text-warning">📤</div>
+                <h4 class="mb-3">Upload E-Commerce Data</h4>
+                <p class="flex-grow-1 text-secondary">Upload customer or staff data in Excel/CSV format. Auto-detects &amp; processes sensitive info.</p>
+
+                <form id="upload-form" enctype="multipart/form-data" class="mt-3">
+                    <input type="file" name="file" class="form-control mb-3" accept=".xlsx,.xls,.csv" required>
+                    <button type="submit" class="btn btn-warning w-100 fw-semibold">Upload File</button>
+                </form>
+
+                <div id="upload-status" class="mt-3 text-success fw-semibold"></div>
+            </div>
+        </div>
+
+        <!-- Data Privacy -->
+        <div class="col-md-5 col-lg-4">
+            <div class="feature-card p-4 border rounded shadow-sm h-100 d-flex flex-column" style="background-color: #f8f9fa;">
+                <div class="feature-icon fs-1 mb-3 text-warning">🔐</div>
+                <h4 class="mb-3">Privacy Protection</h4>
+                <p class="flex-grow-1 text-secondary">Safeguard sensitive information by automatically encrypting and masking confidential data. <span class="text-warning"><strong>Note:</strong> Select confidential fields first after uploading data.</span></p>
+                <div class="d-flex flex-wrap gap-2 justify-content-center mt-3">
+                    <button class="btn btn-warning fw-semibold" onclick="processOperation('encryption')">Encryption</button>
+                    <button class="btn btn-secondary fw-semibold" onclick="processOperation('masking')">Masking</button>
+                    <button class="btn btn-info text-white fw-semibold" onclick="processOperation('hashing')">Hashing</button>
+                    <button class="btn btn-dark fw-semibold" onclick="processOperation('tokenization')">Tokenization</button>
+                    <button class="btn btn-success fw-semibold" onclick="processOperation('apply_all')">Apply All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Replace the Smart Operations card in your index.html with this enhanced version -->
+
+<div class="card mb-5 shadow-sm" style="background-color: #f8f9fa;">
+    <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="fas fa-bolt"></i> Smart Query System</h5>
+    </div>
+    <div class="card-body">
+        <!-- Quick Action Buttons -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <button class="btn btn-outline-warning w-100 fw-semibold btn-sm" onclick="setQuery('show all entries')">
+                    <i class="fas fa-database me-1"></i> Show All
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-info w-100 fw-semibold btn-sm" onclick="setQuery('statistics')">
+                    <i class="fas fa-chart-bar me-1"></i> Statistics
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-success w-100 fw-semibold btn-sm" onclick="setQuery('count')">
+                    <i class="fas fa-calculator me-1"></i> Count
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-secondary w-100 fw-semibold btn-sm" onclick="setQuery('columns')">
+                    <i class="fas fa-list me-1"></i> Columns
+                </button>
+            </div>
+        </div>
+
+        <!-- Query Input -->
+        <div class="mb-3">
+            <div class="input-group">
+                <input type="text" id="quick-query" class="form-control" 
+                       placeholder="Try: 'show all entries', 'count', 'show name', 'unique department', 'where name is john'...">
+                <button class="btn btn-warning fw-semibold" onclick="processQuickQuery()">
+                    <i class="fas fa-search me-1"></i> Query
+                </button>
+                <button class="btn btn-outline-info" onclick="showQueryExamples()" title="Show Examples">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Query Examples (Initially Hidden) -->
+        <div id="query-examples" class="alert alert-info" style="display: none;">
+            <h6><i class="fas fa-lightbulb me-2"></i>Query Examples:</h6>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Basic Queries:</strong>
+                    <ul class="list-unstyled ms-3">
+                        <li><code>show all entries</code> - Display all data</li>
+                        <li><code>count</code> - Total number of entries</li>
+                        <li><code>statistics</code> - Data analysis</li>
+                        <li><code>columns</code> - Show available columns</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <strong>Advanced Queries:</strong>
+                    <ul class="list-unstyled ms-3">
+                        <li><code>show name</code> - Display specific column</li>
+                        <li><code>unique department</code> - Unique values</li>
+                        <li><code>find manager</code> - Search for term</li>
+                        <li><code>where name is john</code> - Filter data</li>
+                    </ul>
+                </div>
+            </div>
+            <div id="dynamic-examples"></div>
+        </div>
+
+        <!-- Query History -->
+        <div id="query-history" class="mt-3" style="display: none;">
+            <h6 class="text-muted">Recent Queries:</h6>
+            <div id="history-buttons" class="d-flex flex-wrap gap-1"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Enhanced query system JavaScript functions
+let queryHistory = [];
+
+// Set query in input field
+function setQuery(query) {
+    document.getElementById('quick-query').value = query;
+    document.getElementById('quick-query').focus();
+}
+
+// Show/hide query examples
+function showQueryExamples() {
+    const examplesDiv = document.getElementById('query-examples');
+    if (examplesDiv.style.display === 'none') {
+        examplesDiv.style.display = 'block';
+        loadDynamicExamples();
+    } else {
+        examplesDiv.style.display = 'none';
+    }
+}
+
+// Load dynamic examples based on available data
+function loadDynamicExamples() {
+    fetch('/query-help')
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.columns) {
+            const dynamicDiv = document.getElementById('dynamic-examples');
+            let content = '<div class="mt-3"><strong>Based on your data:</strong><ul class="list-unstyled ms-3">';
+            
+            // Show first few columns as examples
+            data.columns.slice(0, 5).forEach(col => {
+                content += `<li><button class="btn btn-link btn-sm p-0 text-start" onclick="setQuery('show ${col}')">${col}</button> - Show this column</li>`;
+            });
+            
+            content += '</ul></div>';
+            dynamicDiv.innerHTML = content;
+        }
+    })
+    .catch(error => console.error('Error loading examples:', error));
+}
+
+// Enhanced query processing with history
+function processQuickQuery() {
+    const query = document.getElementById("quick-query").value.trim();
+    if (!query) {
+        alert("Please enter a query first.");
+        return;
+    }
+    
+    // Add to history
+    addToQueryHistory(query);
+    
+    showLoading(`Processing query: "${query}"`);
+    
+    fetch('/query', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify({ query: query })
+    })
+    .then(response => response.json())
+    .then(data => {
+        displayResults(data, `Query: "${query}"`);
+        
+        // Hide examples after successful query
+        document.getElementById('query-examples').style.display = 'none';
+    })
+    .catch(error => {
+        displayResults({error: "Network error: " + error.message}, "Error");
+    });
+}
+
+// Add query to history
+function addToQueryHistory(query) {
+    if (!queryHistory.includes(query)) {
+        queryHistory.unshift(query);
+        if (queryHistory.length > 5) {
+            queryHistory = queryHistory.slice(0, 5); // Keep only last 5
+        }
+        updateQueryHistoryDisplay();
+    }
+}
+
+// Update query history display
+function updateQueryHistoryDisplay() {
+    if (queryHistory.length > 0) {
+        const historyDiv = document.getElementById('query-history');
+        const buttonsDiv = document.getElementById('history-buttons');
+        
+        buttonsDiv.innerHTML = '';
+        queryHistory.forEach(query => {
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-outline-secondary btn-sm';
+            btn.textContent = query.length > 20 ? query.substring(0, 20) + '...' : query;
+            btn.title = query;
+            btn.onclick = () => setQuery(query);
+            buttonsDiv.appendChild(btn);
+        });
+        
+        historyDiv.style.display = 'block';
+    }
+}
+
+// Enhanced keyboard support
+document.getElementById('quick-query').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        processQuickQuery();
+    }
+});
+
+// Auto-suggestions (optional enhancement)
+document.getElementById('quick-query').addEventListener('input', function(e) {
+    const value = e.target.value.toLowerCase();
+    
+    // Simple auto-suggestions
+    const suggestions = [
+        'show all entries',
+        'count',
+        'statistics',
+        'columns',
+        'show ',
+        'unique ',
+        'find ',
+        'where '
+    ];
+    
+    // You can expand this to show a dropdown with suggestions
+    // For now, just update placeholder with relevant suggestion
+    const matchingSuggestion = suggestions.find(s => s.startsWith(value) && value.length > 2);
+    if (matchingSuggestion && value !== matchingSuggestion) {
+        // You could implement autocomplete dropdown here
+    }
+});
+</script>
+
+
+
+    <!-- Results Section -->
+    <div id="results-section" class="card mb-5 shadow-sm" style="display: none; background-color: #f8f9fa;">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0" id="results-title"><i class="fas fa-list"></i> Results</h5>
+        </div>
+        <div class="card-body" id="results-content">
+            <div class="text-center text-muted">
+                <p>Results will appear here...</p>
+            </div>
+        </div>
+    </div>
+
+    
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Global variables
+    let availableColumns = [];
+    let confidentialFields = [];
+
+    // Show/hide confidential fields selection
+    function showConfidentialFieldsSelection(columns) {
+        availableColumns = columns;
+        const section = document.getElementById('confidential-fields-section');
+        const checkboxContainer = document.getElementById('fields-checkboxes');
+        
+        // Clear existing checkboxes
+        checkboxContainer.innerHTML = '';
+        
+        // Create checkboxes for each column
+        columns.forEach(column => {
+            const colDiv = document.createElement('div');
+            colDiv.className = 'col-md-4 col-sm-6 mb-2';
+            
+            colDiv.innerHTML = `
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="${column}" id="field_${column}">
+                    <label class="form-check-label" for="field_${column}">
+                        <strong>${column}</strong>
+                    </label>
+                </div>
+            `;
+            
+            checkboxContainer.appendChild(colDiv);
+        });
+        
+        // Show the section
+        section.style.display = 'block';
+        
+        // Scroll to the section
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Select all fields
+    function selectAllFields() {
+        const checkboxes = document.querySelectorAll('#fields-checkboxes input[type="checkbox"]');
+        checkboxes.forEach(checkbox => checkbox.checked = true);
+    }
+
+    // Clear all fields
+    function clearAllFields() {
+        const checkboxes = document.querySelectorAll('#fields-checkboxes input[type="checkbox"]');
+        checkboxes.forEach(checkbox => checkbox.checked = false);
+    }
+
+    // Save confidential fields selection
+    function saveConfidentialFields() {
+        const checkboxes = document.querySelectorAll('#fields-checkboxes input[type="checkbox"]:checked');
+        confidentialFields = Array.from(checkboxes).map(cb => cb.value);
+        
+        const statusDiv = document.getElementById('selection-status');
+        
+        if (confidentialFields.length === 0) {
+            statusDiv.innerHTML = '<div class="alert alert-warning"><i class="fas fa-exclamation-triangle"></i> No fields selected. Privacy operations will not work.</div>';
+            return;
+        }
+        
+        // Send to backend
+        fetch('/set-confidential-fields', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fields: confidentialFields })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                statusDiv.innerHTML = `<div class="alert alert-success"><i class="fas fa-check-circle"></i> ${data.message}</div>`;
+            } else {
+                statusDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> ${data.error}</div>`;
+            }
+        })
+        .catch(error => {
+            statusDiv.innerHTML = `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle"></i> Error: ${error.message}</div>`;
+        });
+    }
+
+    // Helper function to show loading state
+    function showLoading(message = "Processing...") {
+        const resultSection = document.getElementById("results-section");
+        const resultContent = document.getElementById("results-content");
+        const resultTitle = document.getElementById("results-title");
+
+        resultSection.style.display = "block";
+        resultTitle.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${message}`;
+        resultContent.innerHTML = `<div class="text-center"><div class="spinner-border text-warning" role="status"><span class="visually-hidden">Loading...</span></div></div>`;
+    }
+
+    // Helper function to display results
+    function displayResults(data, title = "Results") {
+        const resultSection = document.getElementById("results-section");
+        const resultContent = document.getElementById("results-content");
+        const resultTitle = document.getElementById("results-title");
+
+        resultSection.style.display = "block";
+        resultTitle.innerHTML = `<i class="fas fa-check-circle"></i> ${title}`;
+        
+        if (data.error) {
+            resultContent.innerHTML = `<div class="alert alert-danger"><strong>Error:</strong> ${data.error}</div>`;
+        } else if (data.table) {
+            let content = `<div class="alert alert-success mb-3">${data.message || 'Operation completed successfully'}</div>`;
+            content += data.table;
+            if (data.rows_processed) {
+                content += `<div class="mt-2 text-muted"><small>Rows processed: ${data.rows_processed}</small></div>`;
+            }
+            if (data.confidential_fields_processed) {
+                content += `<div class="mt-2 text-info"><small><i class="fas fa-shield-alt"></i> Confidential fields processed: ${data.confidential_fields_processed.join(', ')}</small></div>`;
+            }
+            resultContent.innerHTML = content;
+        } else if (data.statistics) {
+            let content = `<div class="alert alert-info mb-3">${data.message || 'Statistics generated'}</div>`;
+            content += '<div class="row">';
+            
+            Object.keys(data.statistics).forEach(key => {
+                const stat = data.statistics[key];
+                content += '<div class="col-md-6 mb-3">';
+                content += `<div class="card"><div class="card-body">`;
+                content += `<h6 class="card-title">${key}</h6>`;
+                
+                if (typeof stat === 'object') {
+                    Object.keys(stat).forEach(subKey => {
+                        content += `<p class="card-text mb-1"><strong>${subKey.replace('_', ' ')}:</strong> ${stat[subKey]}</p>`;
+                    });
+                } else {
+                    content += `<p class="card-text">${stat}</p>`;
+                }
+                
+                content += `</div></div></div>`;
+            });
+            
+            content += '</div>';
+            resultContent.innerHTML = content;
+        } else if (data.message) {
+            resultContent.innerHTML = `<div class="alert alert-info">${data.message}</div>`;
+        } else {
+            resultContent.innerHTML = `<pre class="bg-light p-3 rounded">${JSON.stringify(data, null, 2)}</pre>`;
+        }
+    }
+
+    // Privacy Protection Operations
+    function processOperation(type) {
+        showLoading(`Applying ${type}...`);
+        
+        fetch(`/process/${type}`, { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => displayResults(data, `${type.charAt(0).toUpperCase() + type.slice(1).replace('_', ' ')} Result`))
+        .catch(error => {
+            displayResults({error: "Network error: " + error.message}, "Error");
+        });
+    }
+
+    // Show All Data
+    function showAllData() {
+        showLoading("Loading all data...");
+        
+        fetch('/show-all')
+        .then(response => response.json())
+        .then(data => displayResults(data, "All Data Entries"))
+        .catch(error => {
+            displayResults({error: "Network error: " + error.message}, "Error");
+        });
+    }
+
+    // Get Statistics
+    function getStatistics() {
+        showLoading("Generating insights...");
+        
+        fetch('/statistics')
+        .then(response => response.json())
+        .then(data => displayResults(data, "Data Insights"))
+        .catch(error => {
+            displayResults({error: "Network error: " + error.message}, "Error");
+        });
+    }
+
+    // Process Quick Query
+    function processQuickQuery() {
+        const query = document.getElementById("quick-query").value.trim();
+        if (!query) {
+            alert("Please enter a query first.");
+            return;
+        }
+        
+        showLoading(`Processing query: "${query}"`);
+        
+        fetch('/query', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify({ query: query })
+        })
+        .then(response => response.json())
+        .then(data => displayResults(data, `Query: "${query}"`))
+        .catch(error => {
+            displayResults({error: "Network error: " + error.message}, "Error");
+        });
+    }
+
+    // Handle file upload
+    document.getElementById('upload-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        const uploadStatus = document.getElementById('upload-status');
+        
+        // Show loading
+        uploadStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading file...';
+        uploadStatus.className = 'mt-3 text-info fw-semibold';
+        
+        fetch('/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                uploadStatus.innerHTML = '<i class="fas fa-check-circle"></i> File uploaded successfully!';
+                uploadStatus.className = 'mt-3 text-success fw-semibold';
+                
+                // Display upload results
+                let content = `<div class="alert alert-success mb-3">File uploaded and processed successfully!</div>`;
+                content += data.table;
+                
+                if (data.insights && data.insights.length > 0) {
+                    content += '<h5 class="mt-4">Automatic Insights:</h5>';
+                    content += '<div class="row">';
+                    data.insights.forEach(insight => {
+                        content += `<div class="col-md-6 mb-2"><div class="alert alert-info py-2">${insight}</div></div>`;
+                    });
+                    content += '</div>';
+                }
+                
+                displayResults({
+                    table: content,
+                    message: "File processed successfully"
+                }, "Upload Results");
+                
+                // Get columns and show confidential fields selection
+                fetch('/get-columns')
+                .then(response => response.json())
+                .then(columnData => {
+                    if (columnData.columns) {
+                        showConfidentialFieldsSelection(columnData.columns);
+                    }
+                })
+                .catch(error => console.error('Error getting columns:', error));
+                
+                // Reset form
+                this.reset();
+            } else {
+                uploadStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${data.message}`;
+                uploadStatus.className = 'mt-3 text-danger fw-semibold';
+            }
+        })
+        .catch(error => {
+            uploadStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Upload failed: ${error.message}`;
+            uploadStatus.className = 'mt-3 text-danger fw-semibold';
+        });
+    });
+
+    // Allow Enter key for quick query
+    document.getElementById('quick-query').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            processQuickQuery();
+        }
+    });
+</script>
+{% endblock %}
