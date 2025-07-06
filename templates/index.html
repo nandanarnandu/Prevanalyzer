@@ -1,84 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Document settings and metadata -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Prevalalyzer - E-commerce Analysis System</title>
+    
+    <!-- External CSS libraries for styling and icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- External JavaScript libraries for CSV parsing and encryption -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
     <style>
+        /* Main page background with dark gradient and yellow text */
         body {
-            background: linear-gradient(135deg, #FFD700 0%, #FFF8DC 100%);
+            background: linear-gradient(135deg, #2b2b2b 0%, #404040 50%, #1a1a1a 100%);
             min-height: 100vh;
+            color: #ffe600;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
+        /* Main container card styling with glassmorphism effect */
         .main-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(42, 42, 42, 0.95);
             backdrop-filter: blur(10px);
             border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            border: 2px solid #FFD700;
+            box-shadow: 0 20px 40px rgba(255, 230, 0, 0.2);
+            border: 3px solid #ffe600;
         }
+        
+        /* Gradient text effect for titles */
         .gradient-text {
-            background: linear-gradient(45deg, #FFD700, #000000);
+            background: linear-gradient(45deg, #ffe600, #ffed4e);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            text-shadow: 0 0 20px rgba(255, 230, 0, 0.3);
         }
+        
+        /* Card header styling with yellow gradient background */
         .card-header {
-            background: linear-gradient(45deg, #FFD700, #FFA500) !important;
-            color: black !important;
+            background: linear-gradient(45deg, #ffe600, #ffed4e) !important;
+            color: #2b2b2b !important;
             font-weight: bold;
+            border-bottom: 2px solid #ffe600;
         }
+        
+        /* General card styling with dark background and yellow borders */
+        .card {
+            background: rgba(42, 42, 42, 0.9) !important;
+            border: 2px solid #ffe600 !important;
+            color: #ffe600 !important;
+        }
+        
+        /* Primary button styling with yellow gradient */
         .btn-primary {
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            border: none;
-            color: black;
+            background: linear-gradient(45deg, #ffe600, #ffed4e);
+            border: 2px solid #ffe600;
+            color: #2b2b2b;
             font-weight: bold;
+            transition: all 0.3s ease;
         }
+        
+        /* Primary button hover effect - inverts colors */
+        .btn-primary:hover {
+            background: #2b2b2b;
+            border-color: #ffe600;
+            color: #ffe600;
+            box-shadow: 0 5px 15px rgba(255, 230, 0, 0.3);
+        }
+        
+        /* Success button styling with gray gradient */
         .btn-success {
-            background: linear-gradient(45deg, #32CD32, #228B22);
-            border: none;
-            color: white;
+            background: linear-gradient(45deg, #6c6c6c, #808080);
+            border: 2px solid #ffe600;
+            color: #ffe600;
             font-weight: bold;
         }
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
+        
+        /* Success button hover effect */
+        .btn-success:hover {
+            background: linear-gradient(45deg, #ffe600, #ffed4e);
+            border-color: #2b2b2b;
+            color: #2b2b2b;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        
+        /* Chat container with fixed height and scrollable content */
         .chat-container {
             height: 400px;
             overflow-y: auto;
-            background: #f8f9fa;
+            background: rgba(42, 42, 42, 0.95);
             border-radius: 10px;
             padding: 15px;
-            border: 2px solid #FFD700;
+            border: 2px solid #ffe600;
         }
+        
+        /* User message bubble styling - yellow background */
         .user-message .message-bubble {
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            color: black;
+            background: linear-gradient(45deg, #ffe600, #ffed4e);
+            color: #2b2b2b;
             padding: 12px 18px;
             border-radius: 20px 20px 5px 20px;
             display: inline-block;
             max-width: 70%;
             word-wrap: break-word;
             font-weight: bold;
+            border: 2px solid #ffe600;
         }
+        
+        /* System message bubble styling - gray background */
         .system-message .message-bubble {
-            background: white;
-            color: #333;
+            background: linear-gradient(45deg, #6c6c6c, #808080);
+            color: #ffe600;
             padding: 12px 18px;
             border-radius: 20px 20px 20px 5px;
             display: inline-block;
             max-width: 70%;
             word-wrap: break-word;
-            border: 2px solid #FFD700;
+            border: 2px solid #ffe600;
         }
+        
+        /* Send button positioned inside chat input */
         .send-btn {
             position: absolute;
             right: 8px;
@@ -87,36 +132,137 @@
             border-radius: 50%;
             width: 40px;
             height: 40px;
-            border: none;
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            color: black;
+            border: 2px solid #ffe600;
+            background: linear-gradient(45deg, #ffe600, #ffed4e);
+            color: #2b2b2b;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
         }
-        .chat-input-container {
-            position: relative;
+        
+        /* Send button hover effect */
+        .send-btn:hover {
+            background: #2b2b2b;
+            color: #ffe600;
+            border-color: #ffe600;
         }
+        
+        /* Chat input field styling with rounded corners */
         .chat-input {
             border-radius: 25px;
             padding: 12px 50px 12px 20px;
             resize: none;
-            border: 2px solid #FFD700;
+            border: 2px solid #ffe600;
+            background: rgba(42, 42, 42, 0.9);
+            color: #ffe600;
+        }
+        
+        /* Chat input focus effect */
+        .chat-input:focus {
+            border-color: #ffe600;
+            box-shadow: 0 0 0 0.2rem rgba(255, 230, 0, 0.25);
+            background: rgba(42, 42, 42, 0.95);
+        }
+        
+        /* Badge styling with yellow background */
+        .badge {
+            background: linear-gradient(45deg, #ffe600, #ffed4e) !important;
+            color: #2b2b2b !important;
+            border: 1px solid #ffe600;
+            font-weight: bold;
+        }
+        
+        /* Table warning row styling */
+        .table-warning {
+            background: linear-gradient(45deg, #ffe600, #ffed4e) !important;
+            color: #2b2b2b !important;
+        }
+        
+        /* General table text color */
+        .table {
+            color: #ffe600 !important;
+        }
+        
+        /* Form control styling (inputs, textareas) */
+        .form-control {
+            background: rgba(42, 42, 42, 0.9);
+            border: 2px solid #ffe600;
+            color: #ffe600;
+        }
+        
+        /* Form control focus effect */
+        .form-control:focus {
+            border-color: #ffe600;
+            box-shadow: 0 0 0 0.2rem rgba(255, 230, 0, 0.25);
+            background: rgba(42, 42, 42, 0.95);
+        }
+        
+        /* Form select dropdown styling */
+        .form-select {
+            background: rgba(42, 42, 42, 0.9);
+            border: 2px solid #ffe600;
+            color: #ffe600;
+        }
+        
+        /* Form select focus effect */
+        .form-select:focus {
+            border-color: #ffe600;
+            box-shadow: 0 0 0 0.2rem rgba(255, 230, 0, 0.25);
+        }
+        
+        /* Success alert styling */
+        .alert-success {
+            background: rgba(255, 230, 0, 0.15);
+            border: 1px solid #ffe600;
+            color: #ffe600;
+        }
+        
+        /* Warning alert styling */
+        .alert-warning {
+            background: rgba(255, 230, 0, 0.2);
+            border: 1px solid #ffe600;
+            color: #2b2b2b;
+        }
+        
+        /* Danger alert styling */
+        .alert-danger {
+            background: rgba(255, 0, 0, 0.15);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+        
+        /* Animation class for smooth element appearance */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        /* Keyframes for fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Muted text color for less important content */
+        .text-muted {
+            color: #b3b3b3 !important;
         }
     </style>
 </head>
 <body>
+    <!-- Main container with padding -->
     <div class="container py-4">
     <div class="main-card p-4">
 
         <!-- 🌟 HEADER SECTION -->
+        <!-- Main title and description of the application -->
         <div class="text-center mb-4">
             <h1 class="display-4 fw-bold gradient-text mb-2">🛡️ PREVANALYZER</h1>
             <p class="lead text-muted">E-commerce Data Analysis with Auto-Protection & AI Assistant</p>
         </div>
 
         <!-- 📂 FILE UPLOAD SECTION -->
+        <!-- Where users upload their data files -->
         <div class="row justify-content-center mb-4">
             <div class="col-md-8">
                 <div class="card border-0 shadow-sm">
@@ -126,16 +272,16 @@
                     </div>
                     <!-- Upload Section Body -->
                     <div class="card-body">
-                        <!-- File input field -->
+                        <!-- File input field - allows users to select files -->
                         <div class="mb-3">
                             <input type="file" id="file-input" class="form-control" accept=".xlsx,.xls,.csv" required>
                             <div class="form-text">Supported formats: Excel (.xlsx, .xls) and CSV files</div>
                         </div>
-                        <!-- Upload Button -->
+                        <!-- Upload Button - triggers file processing -->
                         <button type="button" class="btn btn-primary w-100" id="upload-btn">
                             <i class="fas fa-cloud-upload-alt"></i> Upload & Analyze
                         </button>
-                        <!-- Upload status message -->
+                        <!-- Upload status message - shows success/error messages -->
                         <div id="upload-status" class="mt-3"></div>
                     </div>
                 </div>
@@ -143,6 +289,7 @@
         </div>
 
         <!-- 📋 COLUMN HEADERS DISPLAY SECTION -->
+        <!-- Shows all column names found in the uploaded file -->
         <div id="columns-section" class="row mb-4" style="display: none;">
             <div class="col-12">
                 <div class="card border-0 shadow-sm fade-in">
@@ -152,13 +299,14 @@
                     </div>
                     <!-- Detected Columns Body -->
                     <div class="card-body">
-                        <div id="columns-list"></div> <!-- List of columns will be populated here -->
+                        <div id="columns-list"></div> <!-- List of columns will be populated here by JavaScript -->
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- 🔐 CONFIDENTIAL FIELD PROTECTION SECTION -->
+        <!-- Allows users to select which columns need privacy protection -->
         <div id="confidential-section" class="row mb-4" style="display: none;">
             <div class="col-12">
                 <div class="card border-0 shadow-sm fade-in">
@@ -169,9 +317,9 @@
                     <!-- Confidential Fields Body -->
                     <div class="card-body">
                         <p class="mb-3">Select protection techniques for confidential fields:</p>
-                        <div id="confidential-list"></div> <!-- Checkboxes or field list rendered dynamically -->
+                        <div id="confidential-list"></div> <!-- Checkboxes for protection options populated by JavaScript -->
                         <div class="text-center mt-3">
-                            <!-- Apply Protection Button -->
+                            <!-- Apply Protection Button - executes the chosen protection methods -->
                             <button class="btn btn-success" id="apply-protection-btn">
                                 Apply Selected Protections
                             </button>
@@ -182,22 +330,24 @@
         </div>
 
         <!-- 📊 PROTECTED DATA PREVIEW SECTION -->
+        <!-- Shows a sample of the data after protection has been applied -->
         <div id="results-section" class="row mb-4" style="display: none;">
             <div class="col-12">
                 <div class="card border-0 shadow-sm fade-in">
                     <!-- Protected Data Header -->
-                    <div class="card-header" style="background: #000000 !important; color: white !important;">
+                    <div class="card-header">
                         <h5 class="mb-0"><i class="fas fa-table"></i> Protected Data Sample</h5>
                     </div>
                     <!-- Protected Data Body -->
                     <div class="card-body">
-                        <div id="results-content"></div> <!-- Table preview of protected data -->
+                        <div id="results-content"></div> <!-- Table showing protected data populated by JavaScript -->
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- 🤖 AI CHAT ASSISTANT SECTION -->
+        <!-- Interactive chat interface for asking questions about the data -->
         <div id="chat-section" class="row mb-4" style="display: none;">
             <div class="col-12">
                 <div class="card border-0 shadow-sm fade-in">
@@ -207,8 +357,9 @@
                     </div>
                     <!-- Chat Assistant Body -->
                     <div class="card-body">
-                        <!-- Initial system message -->
+                        <!-- Chat history display area -->
                         <div id="chat-container" class="chat-container mb-3">
+                            <!-- Initial system message to welcome users -->
                             <div class="chat-message system-message">
                                 <div class="message-bubble">
                                     <i class="fas fa-robot me-2"></i>
@@ -216,7 +367,7 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Chat input and send button -->
+                        <!-- Chat input area with text box and send button -->
                         <div class="chat-input-container">
                             <textarea id="chat-input" class="form-control chat-input" placeholder="Ask me anything about your data..." rows="2"></textarea>
                             <button id="send-btn" class="send-btn" type="button">
@@ -231,36 +382,41 @@
 </div>
 
     </div>
-
     <script>
-        let uploadedData = [];
-        let originalData = [];
-        let detectedColumns = [];
-        let confidentialFields = [];
-        let protectionTechniques = {};
+        // Global variables to store data throughout the application
+        let uploadedData = [];          // Stores the processed data
+        let originalData = [];          // Keeps a backup of original data
+        let detectedColumns = [];       // List of column names from the file
+        let confidentialFields = [];    // Columns that need protection
+        let protectionTechniques = {};  // Which protection method to use for each field
 
-        // Fixed upload button handler
+        // Event listener for the upload button - handles file upload process
         document.getElementById('upload-btn').addEventListener('click', function () {
             const fileInput = document.getElementById('file-input');
             const file = fileInput.files[0];
 
+            // Check if user selected a file
             if (!file) {
                 showStatus('Please select a file first!', 'warning');
                 return;
             }
 
+            // Show loading state on button
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
             this.disabled = true;
 
+            // Prepare file data for upload
             const formData = new FormData();
             formData.append('file', file);
 
+            // Send file to server for processing
             fetch('/upload', {
                 method: 'POST',
                 body: formData
             })
                 .then(response => response.json())
                 .then(data => {
+                    // Handle successful upload
                     if (data.success) {
                         uploadedData = data.preview_data || [];
                         originalData = JSON.parse(JSON.stringify(uploadedData));
@@ -271,11 +427,13 @@
                         detectConfidentialFields(); // Optional: if you use auto-detection
                         document.getElementById('columns-section').style.display = 'block';
                     } else {
+                        // Handle upload failure
                         showStatus(data.message || 'Upload failed.', 'danger');
                     }
                     resetUploadButton();
                 })
                 .catch(error => {
+                    // Handle network or other errors
                     console.error('Upload error:', error);
                     showStatus('Upload failed. Please try again.', 'danger');
                     resetUploadButton();
@@ -283,10 +441,12 @@
         });
 
 
+        // Display detected columns as colored badges
         function showColumns() {
             const section = document.getElementById('columns-section');
             const list = document.getElementById('columns-list');
             
+            // Create HTML badges for each column
             list.innerHTML = detectedColumns.map(col => 
                 `<span class="badge bg-warning text-dark me-2 mb-2">${col}</span>`
             ).join('');
@@ -294,7 +454,9 @@
             section.style.display = 'block';
         }
 
+        // Automatically detect which columns might contain sensitive data
         function detectConfidentialFields() {
+            // Patterns to match sensitive data column names
             const confidentialPatterns = {
                 email: /email|e_mail|mail/i,
                 phone: /phone|mobile|tel|contact/i,
@@ -307,6 +469,7 @@
 
             confidentialFields = [];
             
+            // Check each column name against patterns
             detectedColumns.forEach(column => {
                 for (const [type, pattern] of Object.entries(confidentialPatterns)) {
                     if (pattern.test(column)) {
@@ -316,19 +479,22 @@
                 }
             });
 
+            // Show protection options if sensitive fields found
             if (confidentialFields.length > 0) {
                 showProtectionDropdowns();
             } else {
-                // No confidential fields, show results directly
+                // No sensitive fields, proceed to results
                 showResults();
                 showChatSection();
             }
         }
 
+        // Create dropdown menus for selecting protection methods
         function showProtectionDropdowns() {
             const section = document.getElementById('confidential-section');
             const list = document.getElementById('confidential-list');
 
+            // Create dropdown for each sensitive field
             list.innerHTML = confidentialFields.map(field => {
                 return `
                     <div class="mb-3">
@@ -342,30 +508,34 @@
                     </div>`;
             }).join('');
 
-            // Add event listener to apply button
+            // Add click handler to apply protection button
             document.getElementById('apply-protection-btn').addEventListener('click', applySelectedProtections);
 
             section.style.display = 'block';
         }
 
+        // Get user's protection choices and apply them
         function applySelectedProtections() {
-            // Get selected techniques
+            // Store selected protection technique for each field
             confidentialFields.forEach(field => {
                 const select = document.getElementById(`technique-${field}`);
                 protectionTechniques[field] = select.value;
             });
 
-            // Apply protections
+            // Apply the chosen protections to data
             protectData();
             showResults();
             showChatSection();
         }
 
+        // Apply protection techniques to sensitive data
         function protectData() {
             uploadedData.forEach(row => {
                 Object.keys(row).forEach(key => {
+                    // Check if this field needs protection
                     if (confidentialFields.includes(key) && row[key]) {
                         const technique = protectionTechniques[key];
+                        // Apply the selected protection method
                         switch (technique) {
                             case 'Masking':
                                 row[key] = maskData(row[key]);
@@ -385,497 +555,550 @@
             });
         }
 
+        // Masking: Hide part of the data with asterisks
         function maskData(value) {
             const str = value.toString();
+            // Special handling for email addresses
             if (str.includes('@')) {
                 const [username, domain] = str.split('@');
                 return username.substring(0, 2) + '***@' + domain;
             }
+            // General masking: show first 2 characters, hide rest
             return str.substring(0, 2) + '*'.repeat(Math.max(0, str.length - 2));
         }
 
+        // Hashing: Convert data to irreversible hash code
         function hashData(value) {
             return CryptoJS.SHA256(value.toString()).toString().substring(0, 16) + '...';
         }
 
+        // Encryption: Replace with encrypted placeholder
         function encryptData(value) {
             return `ENC_${Math.random().toString(36).substring(2, 15)}`;
         }
 
+        // Tokenization: Replace with random token
         function tokenizeData(value) {
             return `TOKEN_${Math.random().toString(36).substring(2, 15)}`;
         }
 
-        function showResults() {
-            const section = document.getElementById('results-section');
-            const content = document.getElementById('results-content');
+        // Display protected data in a table format
+function showResults() {
+    const section = document.getElementById('results-section');
+    const content = document.getElementById('results-content');
 
-            if (uploadedData.length === 0) {
-                content.innerHTML = '<p class="text-muted">No data to display</p>';
-            } else {
-                let tableHTML = '<div class="table-responsive"><table class="table table-striped">';
-                
-                // Headers
-                tableHTML += '<thead class="table-warning"><tr>';
-                detectedColumns.forEach(col => {
-                    const isConfidential = confidentialFields.includes(col);
-                    const technique = protectionTechniques[col] || '';
-                    tableHTML += `<th>${col} ${isConfidential ? `<span class="badge bg-dark ms-1">${technique}</span>` : ''}</th>`;
-                });
-                tableHTML += '</tr></thead>';
+    // Check if there's any data to show
+    if (uploadedData.length === 0) {
+        content.innerHTML = '<p class="text-muted">No data to display</p>';
+    } else {
+        let tableHTML = '<div class="table-responsive"><table class="table table-striped">';
+        
+        // Create table headers with protection badges
+        tableHTML += '<thead class="table-warning"><tr>';
+        detectedColumns.forEach(col => {
+            const isConfidential = confidentialFields.includes(col);
+            const technique = protectionTechniques[col] || '';
+            tableHTML += `<th>${col} ${isConfidential ? `<span class="badge bg-dark ms-1">${technique}</span>` : ''}</th>`;
+        });
+        tableHTML += '</tr></thead>';
 
-                // Data rows (first 10)
-                tableHTML += '<tbody>';
-                uploadedData.slice(0, 10).forEach(row => {
-                    tableHTML += '<tr>';
-                    detectedColumns.forEach(col => {
-                        tableHTML += `<td>${row[col] || ''}</td>`;
-                    });
-                    tableHTML += '</tr>';
-                });
-                tableHTML += '</tbody></table></div>';
-
-                content.innerHTML = tableHTML;
-            }
-
-            section.style.display = 'block';
-        }
-
-        function showChatSection() {
-            document.getElementById('chat-section').style.display = 'block';
-            setupChatHandlers();
-        }
-
-        function setupChatHandlers() {
-            const sendBtn = document.getElementById('send-btn');
-            const chatInput = document.getElementById('chat-input');
-
-            sendBtn.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
+        // Create table rows (show only first 10 records)
+        tableHTML += '<tbody>';
+        uploadedData.slice(0, 10).forEach(row => {
+            tableHTML += '<tr>';
+            detectedColumns.forEach(col => {
+                tableHTML += `<td>${row[col] || ''}</td>`;
             });
+            tableHTML += '</tr>';
+        });
+        tableHTML += '</tbody></table></div>';
+
+        content.innerHTML = tableHTML;
+    }
+
+    section.style.display = 'block';
+}
+
+// Show the chat section and set up its functionality
+function showChatSection() {
+    document.getElementById('chat-section').style.display = 'block';
+    setupChatHandlers();
+}
+
+// Set up event listeners for chat functionality
+function setupChatHandlers() {
+    const sendBtn = document.getElementById('send-btn');
+    const chatInput = document.getElementById('chat-input');
+
+    // Handle send button click
+    sendBtn.addEventListener('click', sendMessage);
+    // Handle Enter key press in chat input
+    chatInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+}
+
+// Process and send user's chat message
+function sendMessage() {
+    const chatInput = document.getElementById('chat-input');
+    const message = chatInput.value.trim();
+    
+    if (!message) return;
+
+    // Add user message to chat
+    addMessageToChat(message, 'user');
+    chatInput.value = '';
+
+    // Add AI response after short delay
+    setTimeout(() => {
+        const response = processQuery(message);
+        addMessageToChat(response, 'system');
+    }, 500);
+}
+
+// Add a message bubble to the chat display
+function addMessageToChat(message, sender) {
+    const chatContainer = document.getElementById('chat-container');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `chat-message ${sender}-message`;
+    
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'message-bubble';
+    // Add robot icon for system messages
+    bubbleDiv.innerHTML = sender === 'system' ? `<i class="fas fa-robot me-2"></i>${message}` : message;
+    
+    messageDiv.appendChild(bubbleDiv);
+    chatContainer.appendChild(messageDiv);
+    // Auto-scroll to bottom
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+// Main function to understand and respond to user queries
+function processQuery(query) {
+    const lowerQuery = query.toLowerCase();
+
+    try {
+        // Query: "How many records/rows?"
+        if (lowerQuery.includes('how many') && (lowerQuery.includes('record') || lowerQuery.includes('row'))) {
+            return `Your dataset contains <strong>${originalData.length}</strong> records.`;
         }
 
-        function sendMessage() {
-            const chatInput = document.getElementById('chat-input');
-            const message = chatInput.value.trim();
-            
-            if (!message) return;
-
-            addMessageToChat(message, 'user');
-            chatInput.value = '';
-
-            setTimeout(() => {
-                const response = processQuery(message);
-                addMessageToChat(response, 'system');
-            }, 500);
+        // Query: "How many columns?" or "What columns?"
+        if (lowerQuery.includes('column') && !lowerQuery.includes('show')) {
+            return `Your dataset has <strong>${detectedColumns.length}</strong> columns: ${detectedColumns.join(', ')}`;
         }
 
-        function addMessageToChat(message, sender) {
-            const chatContainer = document.getElementById('chat-container');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `chat-message ${sender}-message`;
-            
-            const bubbleDiv = document.createElement('div');
-            bubbleDiv.className = 'message-bubble';
-            bubbleDiv.innerHTML = sender === 'system' ? `<i class="fas fa-robot me-2"></i>${message}` : message;
-            
-            messageDiv.appendChild(bubbleDiv);
-            chatContainer.appendChild(messageDiv);
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+        // Query: "Show statistics" or "Show summary"
+        if (lowerQuery.includes('statistic') || lowerQuery.includes('summary')) {
+            return generateStatistics();
         }
 
-        function processQuery(query) {
-            const lowerQuery = query.toLowerCase();
+        // Query: "What's the highest/maximum value?"
+        if (lowerQuery.includes('highest') || lowerQuery.includes('maximum') || lowerQuery.includes('max')) {
+            return findExtreme(query, 'max');
+        }
 
-            try {
-                // Basic info queries
-                if (lowerQuery.includes('how many') && (lowerQuery.includes('record') || lowerQuery.includes('row'))) {
-                    return `Your dataset contains <strong>${originalData.length}</strong> records.`;
-                }
+        // Query: "What's the lowest/minimum value?"
+        if (lowerQuery.includes('lowest') || lowerQuery.includes('minimum') || lowerQuery.includes('min')) {
+            return findExtreme(query, 'min');
+        }
 
-                if (lowerQuery.includes('column') && !lowerQuery.includes('show')) {
-                    return `Your dataset has <strong>${detectedColumns.length}</strong> columns: ${detectedColumns.join(', ')}`;
-                }
+        // Query: "What's the average?" or "Calculate mean"
+        if (lowerQuery.includes('average') || lowerQuery.includes('avg') || lowerQuery.includes('mean')) {
+            return calculateAverage(query);
+        }
 
-                // Statistics queries
-                if (lowerQuery.includes('statistic') || lowerQuery.includes('summary')) {
-                    return generateStatistics();
-                }
+        // Query: "salary of john" or "email of mary"
+        if (lowerQuery.includes(' of ') && !lowerQuery.includes('number of')) {
+            return findPersonData(query);
+        }
 
-                // Highest/Lowest queries
-                if (lowerQuery.includes('highest') || lowerQuery.includes('maximum') || lowerQuery.includes('max')) {
-                    return findExtreme(query, 'max');
-                }
+        // Query: "Show me..." or "Display..." or "List..."
+        if (lowerQuery.includes('show') || lowerQuery.includes('display') || lowerQuery.includes('list')) {
+            return handleShowQuery(query);
+        }
 
-                if (lowerQuery.includes('lowest') || lowerQuery.includes('minimum') || lowerQuery.includes('min')) {
-                    return findExtreme(query, 'min');
-                }
+        // Query: "Count..." or "Number of..."
+        if (lowerQuery.includes('count') || lowerQuery.includes('number of')) {
+            return handleCountQuery(query);
+        }
 
-                // Average queries
-                if (lowerQuery.includes('average') || lowerQuery.includes('avg') || lowerQuery.includes('mean')) {
-                    return calculateAverage(query);
-                }
+        // Query: "Find..." or "Search..." or "Who..."
+        if (lowerQuery.includes('find') || lowerQuery.includes('search') || lowerQuery.includes('who')) {
+            return handleSearchQuery(query);
+        }
 
-                // Specific person queries (e.g., "salary of john", "email of john")
-                if (lowerQuery.includes(' of ') && !lowerQuery.includes('number of')) {
-                    return findPersonData(query);
-                }
-
-                // Show/Display queries
-                if (lowerQuery.includes('show') || lowerQuery.includes('display') || lowerQuery.includes('list')) {
-                    return handleShowQuery(query);
-                }
-
-                // Count/Number queries
-                if (lowerQuery.includes('count') || lowerQuery.includes('number of')) {
-                    return handleCountQuery(query);
-                }
-
-                // Search queries
-                if (lowerQuery.includes('find') || lowerQuery.includes('search') || lowerQuery.includes('who')) {
-                    return handleSearchQuery(query);
-                }
-
-                // Protected fields info
-                if (lowerQuery.includes('protected') || lowerQuery.includes('confidential')) {
-                    if (confidentialFields.length === 0) {
-                        return "No confidential fields were detected.";
-                    }
-                    const info = confidentialFields.map(field => 
-                        `• <strong>${field}</strong> - ${protectionTechniques[field] || 'Not protected'}`
-                    ).join('<br>');
-                    return `Protected fields:<br><br>${info}`;
-                }
-
-                // Help query
-                if (lowerQuery.includes('help')) {
-                    return getHelpMessage();
-                }
-
-                // Fallback - try to find column matches and provide data
-                return handleGenericQuery(query);
-
-            } catch (error) {
-                return "I encountered an error processing your query. Please try rephrasing your question.";
+        // Query: "What fields are protected?" or "Show confidential data"
+        if (lowerQuery.includes('protected') || lowerQuery.includes('confidential')) {
+            if (confidentialFields.length === 0) {
+                return "No confidential fields were detected.";
             }
+            const info = confidentialFields.map(field => 
+                `• <strong>${field}</strong> - ${protectionTechniques[field] || 'Not protected'}`
+            ).join('<br>');
+            return `Protected fields:<br><br>${info}`;
         }
 
-        function generateStatistics() {
-            let stats = `<strong>📊 Dataset Statistics</strong><br><br>`;
-            stats += `• Total Records: <strong>${originalData.length}</strong><br>`;
-            stats += `• Total Columns: <strong>${detectedColumns.length}</strong><br>`;
-            stats += `• Protected Fields: <strong>${confidentialFields.length}</strong><br><br>`;
-
-            // Numerical statistics
-            const numericalColumns = findNumericalColumns();
-            if (numericalColumns.length > 0) {
-                stats += `<strong>📈 Numerical Analysis:</strong><br>`;
-                numericalColumns.slice(0, 5).forEach(col => {
-                    const values = getNumericValues(col);
-                    if (values.length > 0) {
-                        const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
-                        const min = Math.min(...values);
-                        const max = Math.max(...values);
-                        stats += `• <strong>${col}</strong>: Avg: ${avg}, Min: ${min}, Max: ${max}<br>`;
-                    }
-                });
-            }
-
-            // Text column analysis
-            const textColumns = detectedColumns.filter(col => !numericalColumns.includes(col));
-            if (textColumns.length > 0) {
-                stats += `<br><strong>📝 Text Columns:</strong><br>`;
-                textColumns.slice(0, 3).forEach(col => {
-                    const uniqueCount = getUniqueValues(col).length;
-                    stats += `• <strong>${col}</strong>: ${uniqueCount} unique values<br>`;
-                });
-            }
-
-            return stats;
+        // Query: "Help" - show available commands
+        if (lowerQuery.includes('help')) {
+            return getHelpMessage();
         }
 
-        function findExtreme(query, type) {
-            const column = extractColumnFromQuery(query);
-            if (!column) {
-                return "Please specify which column you want to find the " + type + " value for. Available columns: " + detectedColumns.join(', ');
+        // Fallback: try to understand any other query
+        return handleGenericQuery(query);
+
+    } catch (error) {
+        // Handle any errors in query processing
+        return "I encountered an error processing your query. Please try rephrasing your question.";
+    }
+}
+        // Function to create a summary of the dataset with basic statistics
+function generateStatistics() {
+    let stats = `<strong>📊 Dataset Statistics</strong><br><br>`;
+    stats += `• Total Records: <strong>${originalData.length}</strong><br>`;
+    stats += `• Total Columns: <strong>${detectedColumns.length}</strong><br>`;
+    stats += `• Protected Fields: <strong>${confidentialFields.length}</strong><br><br>`;
+
+    // Find columns with numbers and calculate basic math (average, min, max)
+    const numericalColumns = findNumericalColumns();
+    if (numericalColumns.length > 0) {
+        stats += `<strong>📈 Numerical Analysis:</strong><br>`;
+        numericalColumns.slice(0, 5).forEach(col => {
+            const values = getNumericValues(col);
+            if (values.length > 0) {
+                const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
+                const min = Math.min(...values);
+                const max = Math.max(...values);
+                stats += `• <strong>${col}</strong>: Avg: ${avg}, Min: ${min}, Max: ${max}<br>`;
             }
+        });
+    }
 
-            const values = getNumericValues(column);
-            if (values.length === 0) {
-                return `Column "${column}" doesn't contain numerical data for ${type} calculation.`;
+    // Find columns with text and count how many different values each has
+    const textColumns = detectedColumns.filter(col => !numericalColumns.includes(col));
+    if (textColumns.length > 0) {
+        stats += `<br><strong>📝 Text Columns:</strong><br>`;
+        textColumns.slice(0, 3).forEach(col => {
+            const uniqueCount = getUniqueValues(col).length;
+            stats += `• <strong>${col}</strong>: ${uniqueCount} unique values<br>`;
+        });
+    }
+
+    return stats;
+}
+
+// Function to find the highest or lowest value in a column
+function findExtreme(query, type) {
+    const column = extractColumnFromQuery(query);
+    if (!column) {
+        return "Please specify which column you want to find the " + type + " value for. Available columns: " + detectedColumns.join(', ');
+    }
+
+    const values = getNumericValues(column);
+    if (values.length === 0) {
+        return `Column "${column}" doesn't contain numerical data for ${type} calculation.`;
+    }
+
+    // Find the highest or lowest number in the column
+    const extremeValue = type === 'max' ? Math.max(...values) : Math.min(...values);
+    const record = originalData.find(row => parseFloat(row[column]) === extremeValue);
+
+    // Show the complete record that has this extreme value
+    if (record) {
+        let result = `<strong>${type === 'max' ? 'Highest' : 'Lowest'} ${column}:</strong> ${extremeValue}<br><br>`;
+        result += `<strong>Record Details:</strong><br>`;
+        detectedColumns.forEach(col => {
+            if (record[col]) {
+                result += `• <strong>${col}:</strong> ${record[col]}<br>`;
             }
+        });
+        return result;
+    }
 
-            const extremeValue = type === 'max' ? Math.max(...values) : Math.min(...values);
-            const record = originalData.find(row => parseFloat(row[column]) === extremeValue);
+    return `${type === 'max' ? 'Highest' : 'Lowest'} ${column}: ${extremeValue}`;
+}
 
-            if (record) {
-                let result = `<strong>${type === 'max' ? 'Highest' : 'Lowest'} ${column}:</strong> ${extremeValue}<br><br>`;
-                result += `<strong>Record Details:</strong><br>`;
-                detectedColumns.forEach(col => {
-                    if (record[col]) {
-                        result += `• <strong>${col}:</strong> ${record[col]}<br>`;
-                    }
-                });
-                return result;
+// Function to calculate the average (mean) of numbers in a column
+function calculateAverage(query) {
+    const column = extractColumnFromQuery(query);
+    if (!column) {
+        return "Please specify which column you want to calculate average for. Available numerical columns: " + findNumericalColumns().join(', ');
+    }
+
+    const values = getNumericValues(column);
+    if (values.length === 0) {
+        return `Column "${column}" doesn't contain numerical data for average calculation.`;
+    }
+
+    // Add all numbers together and divide by how many numbers there are
+    const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
+    return `<strong>Average ${column}:</strong> ${avg} (based on ${values.length} records)`;
+}
+
+// Function to find specific information about a person (e.g., "salary of john")
+function findPersonData(query) {
+    const parts = query.toLowerCase().split(' of ');
+    if (parts.length < 2) return "Please specify what information you want and for whom (e.g., 'salary of john').";
+
+    const attribute = parts[0].trim(); // what info they want (e.g., "salary")
+    const person = parts[1].trim();    // whose info they want (e.g., "john")
+
+    // Find which column contains the information they're looking for
+    const attributeColumn = detectedColumns.find(col => 
+        col.toLowerCase().includes(attribute) || attribute.includes(col.toLowerCase())
+    );
+
+    if (!attributeColumn) {
+        return `Couldn't find column for "${attribute}". Available columns: ${detectedColumns.join(', ')}`;
+    }
+
+    // Search for records that mention this person's name
+    const matchingRecords = originalData.filter(row => 
+        Object.values(row).some(value => 
+            value && value.toString().toLowerCase().includes(person)
+        )
+    );
+
+    if (matchingRecords.length === 0) {
+        return `No records found for "${person}".`;
+    }
+
+    // If only one person found, show their info
+    if (matchingRecords.length === 1) {
+        const value = matchingRecords[0][attributeColumn];
+        return `<strong>${attributeColumn} of ${person}:</strong> ${value || 'Not available'}`;
+    } else {
+        // If multiple people found, show all matches
+        let result = `Found ${matchingRecords.length} records matching "${person}":<br><br>`;
+        matchingRecords.forEach((record, index) => {
+            const nameField = findNameField(record);
+            const identifier = nameField ? record[nameField] : `Record ${index + 1}`;
+            result += `• <strong>${identifier}:</strong> ${record[attributeColumn] || 'N/A'}<br>`;
+        });
+        return result;
+    }
+}
+
+// Function to display data when user asks to "show" something
+function handleShowQuery(query) {
+    const lowerQuery = query.toLowerCase();
+
+    // If they want to see all the data
+    if (lowerQuery.includes('all') || lowerQuery.includes('data')) {
+        return displayAllData();
+    }
+
+    // If they want to see the column names
+    if (lowerQuery.includes('column')) {
+        return `Dataset columns:<br><br>${detectedColumns.map(col => `• ${col}`).join('<br>')}`;
+    }
+
+    // If they want to see data from a specific column
+    const column = extractColumnFromQuery(query);
+    if (column) {
+        return displayColumnData(column);
+    }
+
+    return "What would you like me to show? Try: 'show all data', 'show columns', or 'show [column name]'";
+}
+
+// Function to count things when user asks "how many"
+function handleCountQuery(query) {
+    const column = extractColumnFromQuery(query);
+    if (column) {
+        // Count unique values in a specific column
+        const uniqueValues = getUniqueValues(column);
+        return `<strong>${column}</strong> has <strong>${uniqueValues.length}</strong> unique values.`;
+    }
+
+    // If no specific column mentioned, show total number of records
+    return `Total records: <strong>${originalData.length}</strong>`;
+}
+
+        // Function to search for records that contain specific keywords
+function handleSearchQuery(query) {
+    const searchTerms = extractSearchTerms(query);
+    if (!searchTerms) {
+        return "Please specify what you're looking for (e.g., 'find john', 'search for manager').";
+    }
+
+    // Look through all records to find ones that contain the search terms
+    const results = originalData.filter(row => 
+        Object.values(row).some(value => 
+            value && value.toString().toLowerCase().includes(searchTerms.toLowerCase())
+        )
+    );
+
+    if (results.length === 0) {
+        return `No records found matching "${searchTerms}".`;
+    }
+
+    // Display the search results (maximum 5 records)
+    let response = `Found <strong>${results.length}</strong> record(s) matching "${searchTerms}":<br><br>`;
+    results.slice(0, 5).forEach((record, index) => {
+        const nameField = findNameField(record);
+        const identifier = nameField ? record[nameField] : `Record ${index + 1}`;
+        response += `<strong>${identifier}:</strong><br>`;
+        Object.keys(record).forEach(key => {
+            if (record[key]) {
+                response += `&nbsp;&nbsp;• ${key}: ${record[key]}<br>`;
             }
+        });
+        response += '<br>';
+    });
 
-            return `${type === 'max' ? 'Highest' : 'Lowest'} ${column}: ${extremeValue}`;
-        }
+    if (results.length > 5) {
+        response += `...and ${results.length - 5} more records.`;
+    }
 
-        function calculateAverage(query) {
-            const column = extractColumnFromQuery(query);
-            if (!column) {
-                return "Please specify which column you want to calculate average for. Available numerical columns: " + findNumericalColumns().join(', ');
+    return response;
+}
+
+// Function to handle questions that don't match specific patterns
+function handleGenericQuery(query) {
+    // Try to match column names in the query
+    const matchingColumns = detectedColumns.filter(col => 
+        query.toLowerCase().includes(col.toLowerCase())
+    );
+
+    if (matchingColumns.length > 0) {
+        return displayColumnData(matchingColumns[0]);
+    }
+
+    // If no match found, show help message with examples
+    return `I'm not sure how to help with that. Try asking about:<br>
+    • Statistics: "show statistics"<br>
+    • Specific values: "highest salary", "average age"<br>
+    • Person info: "salary of john", "email of mary"<br>
+    • Search: "find manager", "who has gmail"<br>
+    • Data display: "show all data", "show columns"`;
+}
+
+// Helper functions
+// Function to find which columns contain numbers
+function findNumericalColumns() {
+    return detectedColumns.filter(col => {
+        const values = getNumericValues(col);
+        return values.length > 0;
+    });
+}
+
+// Function to get only the numeric values from a column
+function getNumericValues(column) {
+    return originalData
+        .map(row => parseFloat(row[column]))
+        .filter(val => !isNaN(val));
+}
+
+// Function to get all unique (non-repeating) values from a column
+function getUniqueValues(column) {
+    return [...new Set(originalData.map(row => row[column]).filter(v => v))];
+}
+
+// Function to find which column the user is asking about
+function extractColumnFromQuery(query) {
+    const words = query.toLowerCase().split(/\s+/);
+    return detectedColumns.find(col => 
+        words.some(word => col.toLowerCase().includes(word) || word.includes(col.toLowerCase()))
+    );
+}
+
+// Function to extract what the user wants to search for
+function extractSearchTerms(query) {
+    const patterns = [
+        /find (.+)/i,
+        /search (?:for )?(.+)/i,
+        /who (.+)/i,
+        /show me (.+)/i
+    ];
+
+    for (const pattern of patterns) {
+        const match = query.match(pattern);
+        if (match) return match[1].trim();
+    }
+
+    return null;
+}
+
+// Function to find which column contains people's names
+function findNameField(record) {
+    const nameFields = ['name', 'full_name', 'firstname', 'first_name', 'employee_name', 'customer_name'];
+    return detectedColumns.find(col => 
+        nameFields.some(field => col.toLowerCase().includes(field)) && record[col]
+    );
+}
+
+// Function to display all values from a specific column
+function displayColumnData(column) {
+    const values = getUniqueValues(column);
+    if (values.length > 10) {
+        return `<strong>${column}</strong> has ${values.length} unique values. First 10:<br><br>${values.slice(0, 10).map(val => `• ${val}`).join('<br>')}<br><br>...and ${values.length - 10} more.`;
+    } else {
+        return `<strong>${column}</strong> values:<br><br>${values.map(val => `• ${val}`).join('<br>')}`;
+    }
+}
+
+// Function to display all records in the dataset
+function displayAllData() {
+    if (originalData.length > 10) {
+        return `Dataset is too large to display completely (${originalData.length} records). Showing first 10 records:<br><br>` + 
+               formatRecordsForDisplay(originalData.slice(0, 10));
+    } else {
+        return `Complete dataset (${originalData.length} records):<br><br>` + 
+               formatRecordsForDisplay(originalData);
+    }
+}
+
+// Function to format records in a nice readable way
+function formatRecordsForDisplay(records) {
+    return records.map((record, index) => {
+        let formatted = `<strong>Record ${index + 1}:</strong><br>`;
+        Object.keys(record).forEach(key => {
+            if (record[key]) {
+                formatted += `&nbsp;&nbsp;• ${key}: ${record[key]}<br>`;
             }
+        });
+        return formatted;
+    }).join('<br>');
+}
 
-            const values = getNumericValues(column);
-            if (values.length === 0) {
-                return `Column "${column}" doesn't contain numerical data for average calculation.`;
-            }
+// Function to show help message with all available commands
+function getHelpMessage() {
+    return `<strong>🤖 I can help you analyze your data!</strong><br><br>
+    <strong>📊 Statistics & Analysis:</strong><br>
+    • "Show statistics" - Complete data overview<br>
+    • "Highest salary" / "Lowest price" - Find extremes<br>
+    • "Average age" / "Mean salary" - Calculate averages<br><br>
+    
+    <strong>🔍 Search & Find:</strong><br>
+    • "Find john" / "Search manager" - Find specific records<br>
+    • "Salary of john" / "Email of mary" - Get specific person data<br>
+    • "Who has gmail" / "Find developers" - Pattern matching<br><br>
+    
+    <strong>📋 Data Display:</strong><br>
+    • "Show all data" - Display records<br>
+    • "Show columns" - List all columns<br>
+    • "Count unique values in department" - Count analysis<br><br>
+    
+    <strong>🛡️ Protection Info:</strong><br>
+    • "Which fields are protected?" - Security overview`;
+}
 
-            const avg = (values.reduce((a, b) => a + b, 0) / values.length).toFixed(2);
-            return `<strong>Average ${column}:</strong> ${avg} (based on ${values.length} records)`;
-        }
+// Function to show status messages to the user
+function showStatus(message, type) {
+    const status = document.getElementById('upload-status');
+    status.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+}
 
-        function findPersonData(query) {
-            const parts = query.toLowerCase().split(' of ');
-            if (parts.length < 2) return "Please specify what information you want and for whom (e.g., 'salary of john').";
-
-            const attribute = parts[0].trim();
-            const person = parts[1].trim();
-
-            // Find matching column for attribute
-            const attributeColumn = detectedColumns.find(col => 
-                col.toLowerCase().includes(attribute) || attribute.includes(col.toLowerCase())
-            );
-
-            if (!attributeColumn) {
-                return `Couldn't find column for "${attribute}". Available columns: ${detectedColumns.join(', ')}`;
-            }
-
-            // Find matching records for person
-            const matchingRecords = originalData.filter(row => 
-                Object.values(row).some(value => 
-                    value && value.toString().toLowerCase().includes(person)
-                )
-            );
-
-            if (matchingRecords.length === 0) {
-                return `No records found for "${person}".`;
-            }
-
-            if (matchingRecords.length === 1) {
-                const value = matchingRecords[0][attributeColumn];
-                return `<strong>${attributeColumn} of ${person}:</strong> ${value || 'Not available'}`;
-            } else {
-                let result = `Found ${matchingRecords.length} records matching "${person}":<br><br>`;
-                matchingRecords.forEach((record, index) => {
-                    const nameField = findNameField(record);
-                    const identifier = nameField ? record[nameField] : `Record ${index + 1}`;
-                    result += `• <strong>${identifier}:</strong> ${record[attributeColumn] || 'N/A'}<br>`;
-                });
-                return result;
-            }
-        }
-
-        function handleShowQuery(query) {
-            const lowerQuery = query.toLowerCase();
-
-            if (lowerQuery.includes('all') || lowerQuery.includes('data')) {
-                return displayAllData();
-            }
-
-            if (lowerQuery.includes('column')) {
-                return `Dataset columns:<br><br>${detectedColumns.map(col => `• ${col}`).join('<br>')}`;
-            }
-
-            // Try to find specific column to show
-            const column = extractColumnFromQuery(query);
-            if (column) {
-                return displayColumnData(column);
-            }
-
-            return "What would you like me to show? Try: 'show all data', 'show columns', or 'show [column name]'";
-        }
-
-        function handleCountQuery(query) {
-            const column = extractColumnFromQuery(query);
-            if (column) {
-                const uniqueValues = getUniqueValues(column);
-                return `<strong>${column}</strong> has <strong>${uniqueValues.length}</strong> unique values.`;
-            }
-
-            return `Total records: <strong>${originalData.length}</strong>`;
-        }
-
-        function handleSearchQuery(query) {
-            const searchTerms = extractSearchTerms(query);
-            if (!searchTerms) {
-                return "Please specify what you're looking for (e.g., 'find john', 'search for manager').";
-            }
-
-            const results = originalData.filter(row => 
-                Object.values(row).some(value => 
-                    value && value.toString().toLowerCase().includes(searchTerms.toLowerCase())
-                )
-            );
-
-            if (results.length === 0) {
-                return `No records found matching "${searchTerms}".`;
-            }
-
-            let response = `Found <strong>${results.length}</strong> record(s) matching "${searchTerms}":<br><br>`;
-            results.slice(0, 5).forEach((record, index) => {
-                const nameField = findNameField(record);
-                const identifier = nameField ? record[nameField] : `Record ${index + 1}`;
-                response += `<strong>${identifier}:</strong><br>`;
-                Object.keys(record).forEach(key => {
-                    if (record[key]) {
-                        response += `&nbsp;&nbsp;• ${key}: ${record[key]}<br>`;
-                    }
-                });
-                response += '<br>';
-            });
-
-            if (results.length > 5) {
-                response += `...and ${results.length - 5} more records.`;
-            }
-
-            return response;
-        }
-
-        function handleGenericQuery(query) {
-            // Try to match column names in the query
-            const matchingColumns = detectedColumns.filter(col => 
-                query.toLowerCase().includes(col.toLowerCase())
-            );
-
-            if (matchingColumns.length > 0) {
-                return displayColumnData(matchingColumns[0]);
-            }
-
-            return `I'm not sure how to help with that. Try asking about:<br>
-            • Statistics: "show statistics"<br>
-            • Specific values: "highest salary", "average age"<br>
-            • Person info: "salary of john", "email of mary"<br>
-            • Search: "find manager", "who has gmail"<br>
-            • Data display: "show all data", "show columns"`;
-        }
-
-        // Helper functions
-        function findNumericalColumns() {
-            return detectedColumns.filter(col => {
-                const values = getNumericValues(col);
-                return values.length > 0;
-            });
-        }
-
-        function getNumericValues(column) {
-            return originalData
-                .map(row => parseFloat(row[column]))
-                .filter(val => !isNaN(val));
-        }
-
-        function getUniqueValues(column) {
-            return [...new Set(originalData.map(row => row[column]).filter(v => v))];
-        }
-
-        function extractColumnFromQuery(query) {
-            const words = query.toLowerCase().split(/\s+/);
-            return detectedColumns.find(col => 
-                words.some(word => col.toLowerCase().includes(word) || word.includes(col.toLowerCase()))
-            );
-        }
-
-        function extractSearchTerms(query) {
-            const patterns = [
-                /find (.+)/i,
-                /search (?:for )?(.+)/i,
-                /who (.+)/i,
-                /show me (.+)/i
-            ];
-
-            for (const pattern of patterns) {
-                const match = query.match(pattern);
-                if (match) return match[1].trim();
-            }
-
-            return null;
-        }
-
-        function findNameField(record) {
-            const nameFields = ['name', 'full_name', 'firstname', 'first_name', 'employee_name', 'customer_name'];
-            return detectedColumns.find(col => 
-                nameFields.some(field => col.toLowerCase().includes(field)) && record[col]
-            );
-        }
-
-        function displayColumnData(column) {
-            const values = getUniqueValues(column);
-            if (values.length > 10) {
-                return `<strong>${column}</strong> has ${values.length} unique values. First 10:<br><br>${values.slice(0, 10).map(val => `• ${val}`).join('<br>')}<br><br>...and ${values.length - 10} more.`;
-            } else {
-                return `<strong>${column}</strong> values:<br><br>${values.map(val => `• ${val}`).join('<br>')}`;
-            }
-        }
-
-        function displayAllData() {
-            if (originalData.length > 10) {
-                return `Dataset is too large to display completely (${originalData.length} records). Showing first 10 records:<br><br>` + 
-                       formatRecordsForDisplay(originalData.slice(0, 10));
-            } else {
-                return `Complete dataset (${originalData.length} records):<br><br>` + 
-                       formatRecordsForDisplay(originalData);
-            }
-        }
-
-        function formatRecordsForDisplay(records) {
-            return records.map((record, index) => {
-                let formatted = `<strong>Record ${index + 1}:</strong><br>`;
-                Object.keys(record).forEach(key => {
-                    if (record[key]) {
-                        formatted += `&nbsp;&nbsp;• ${key}: ${record[key]}<br>`;
-                    }
-                });
-                return formatted;
-            }).join('<br>');
-        }
-
-        function getHelpMessage() {
-            return `<strong>🤖 I can help you analyze your data!</strong><br><br>
-            <strong>📊 Statistics & Analysis:</strong><br>
-            • "Show statistics" - Complete data overview<br>
-            • "Highest salary" / "Lowest price" - Find extremes<br>
-            • "Average age" / "Mean salary" - Calculate averages<br><br>
-            
-            <strong>🔍 Search & Find:</strong><br>
-            • "Find john" / "Search manager" - Find specific records<br>
-            • "Salary of john" / "Email of mary" - Get specific person data<br>
-            • "Who has gmail" / "Find developers" - Pattern matching<br><br>
-            
-            <strong>📋 Data Display:</strong><br>
-            • "Show all data" - Display records<br>
-            • "Show columns" - List all columns<br>
-            • "Count unique values in department" - Count analysis<br><br>
-            
-            <strong>🛡️ Protection Info:</strong><br>
-            • "Which fields are protected?" - Security overview`;
-        }
-
-        function showStatus(message, type) {
-            const status = document.getElementById('upload-status');
-            status.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
-        }
-
-        function resetUploadButton() {
-            const btn = document.getElementById('upload-btn');
-            btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload & Analyze';
-            btn.disabled = false;
-        }
-    </script>
+// Function to reset the upload button to its original state
+function resetUploadButton() {
+    const btn = document.getElementById('upload-btn');
+    btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Upload & Analyze';
+    btn.disabled = false;
+}
+</script>
 </body>
 </html>

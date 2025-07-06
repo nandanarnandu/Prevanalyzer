@@ -1,75 +1,274 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <!-- Basic HTML page information -->
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Page title that can be changed by other templates -->
     <title>{% block title %}PrivAnalyzer{% endblock %}</title>
 
-    <!-- Bootstrap 5 CSS -->
+    <!-- Import Bootstrap CSS framework for styling and layout -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- Font Awesome 6 CSS -->
+    <!-- Import Font Awesome for icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
     <style>
+        /* Main body styling - sets background and overall appearance */
         body {
-            padding-top: 70px;
-            background-color: #f8f9fa; /* Light background for better contrast */
+            padding-top: 70px;  /* Space for fixed navbar at top */
+            background: linear-gradient(135deg, #2b2b2b 0%, #404040 50%, #1a1a1a 100%);  /* Dark gradient background */
+            min-height: 100vh;  /* Make sure page takes full screen height */
+            color: #ffe600;  /* Yellow text color */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;  /* Font family */
         }
-        /* Navbar Brand Icon */
+        
+        /* Navigation bar styling */
+        .navbar {
+            background: linear-gradient(45deg, #2b2b2b, #404040) !important;  /* Dark gradient background */
+            border-bottom: 3px solid #ffe600;  /* Yellow border at bottom */
+            backdrop-filter: blur(10px);  /* Blur effect behind navbar */
+        }
+        
+        /* Brand name styling in navbar */
+        .navbar-brand {
+            color: #ffe600 !important;  /* Yellow color */
+            font-weight: bold;  /* Make text bold */
+            text-shadow: 0 0 10px rgba(255, 230, 0, 0.3);  /* Glowing effect */
+        }
+        
+        /* Brand name hover effect */
+        .navbar-brand:hover {
+            color: #ffed4e !important;  /* Lighter yellow on hover */
+        }
+        
+        /* Icon next to brand name */
         .navbar-brand i {
-            margin-right: 8px;
+            margin-right: 8px;  /* Space between icon and text */
+            color: #ffe600;  /* Yellow color */
         }
-        /* Table styling */
+        
+        /* Table row striping - alternating row colors */
         table.table-striped tbody tr:nth-of-type(odd) {
-            background-color: #e9f2ff; /* Light blue for table rows */
+            background-color: rgba(255, 230, 0, 0.1) !important;  /* Light yellow background */
         }
+        
+        /* Main table styling */
+        .table {
+            color: #ffe600 !important;  /* Yellow text */
+            background: rgba(42, 42, 42, 0.9) !important;  /* Dark semi-transparent background */
+        }
+        
+        /* Table header styling */
+        .table th {
+            background: linear-gradient(45deg, #ffe600, #ffed4e) !important;  /* Yellow gradient */
+            color: #2b2b2b !important;  /* Dark text on yellow background */
+            border-color: #ffe600 !important;  /* Yellow borders */
+            font-weight: bold;  /* Bold text */
+        }
+        
+        /* Table cell styling */
+        .table td {
+            border-color: #6c6c6c !important;  /* Gray borders */
+        }
+        
+        /* Main content container styling */
+        .container {
+            background: rgba(42, 42, 42, 0.9);  /* Dark semi-transparent background */
+            border-radius: 15px;  /* Rounded corners */
+            padding: 20px;  /* Space inside container */
+            margin-top: 20px;  /* Space above container */
+            box-shadow: 0 10px 30px rgba(255, 230, 0, 0.2);  /* Yellow shadow effect */
+            border: 2px solid #ffe600;  /* Yellow border */
+        }
+        
         /* Footer styling */
         footer {
             position: relative;
             bottom: 0;
             width: 100%;
+            background: linear-gradient(45deg, #2b2b2b, #1a1a1a) !important;  /* Dark gradient */
+            border-top: 3px solid #ffe600;  /* Yellow border at top */
+            color: #ffe600 !important;  /* Yellow text */
         }
-        /* Flash message container */
+        
+        /* Footer links styling */
+        footer a {
+            color: #ffe600 !important;  /* Yellow links */
+            text-decoration: none;  /* Remove underline */
+        }
+        
+        footer a:hover {
+            color: #ffed4e !important;  /* Lighter yellow on hover */
+        }
+        
+        /* Flash messages container positioning */
         #flash-messages {
-            position: fixed;
-            top: 56px;
-            right: 15px;
-            z-index: 1050;
-            max-width: 350px;
+            position: fixed;  /* Stay in place when scrolling */
+            top: 56px;  /* Position below navbar */
+            right: 15px;  /* Space from right edge */
+            z-index: 1050;  /* Appear above other content */
+            max-width: 350px;  /* Maximum width */
+        }
+        
+        /* Different alert message styles */
+        .alert-info {
+            background: rgba(255, 230, 0, 0.15) !important;  /* Light yellow background */
+            border: 1px solid #ffe600 !important;  /* Yellow border */
+            color: #ffe600 !important;  /* Yellow text */
+        }
+        
+        .alert-success {
+            background: rgba(255, 230, 0, 0.2) !important;  /* Slightly darker yellow */
+            border: 1px solid #ffe600 !important;
+            color: #ffe600 !important;
+        }
+        
+        .alert-warning {
+            background: rgba(255, 230, 0, 0.3) !important;  /* Even darker yellow */
+            border: 1px solid #ffe600 !important;
+            color: #2b2b2b !important;  /* Dark text for readability */
+        }
+        
+        .alert-danger {
+            background: rgba(255, 0, 0, 0.15) !important;  /* Light red for errors */
+            border: 1px solid #ff4444 !important;  /* Red border */
+            color: #ff4444 !important;  /* Red text */
+        }
+        
+        /* Primary button styling */
+        .btn-primary {
+            background: linear-gradient(45deg, #ffe600, #ffed4e) !important;  /* Yellow gradient */
+            border: 2px solid #ffe600 !important;  /* Yellow border */
+            color: #2b2b2b !important;  /* Dark text */
+            font-weight: bold;  /* Bold text */
+            transition: all 0.3s ease;  /* Smooth animation on hover */
+        }
+        
+        /* Primary button hover effect */
+        .btn-primary:hover {
+            background: #2b2b2b !important;  /* Dark background on hover */
+            border-color: #ffe600 !important;  /* Keep yellow border */
+            color: #ffe600 !important;  /* Yellow text on hover */
+            box-shadow: 0 5px 15px rgba(255, 230, 0, 0.3);  /* Glowing shadow */
+        }
+        
+        /* Secondary button styling */
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c6c6c, #808080) !important;  /* Gray gradient */
+            border: 2px solid #ffe600 !important;  /* Yellow border */
+            color: #ffe600 !important;  /* Yellow text */
+            font-weight: bold;
+        }
+        
+        /* Secondary button hover effect */
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #ffe600, #ffed4e) !important;  /* Yellow on hover */
+            border-color: #2b2b2b !important;  /* Dark border */
+            color: #2b2b2b !important;  /* Dark text */
+        }
+        
+        /* Form input field styling */
+        .form-control {
+            background: rgba(42, 42, 42, 0.9) !important;  /* Dark background */
+            border: 2px solid #ffe600 !important;  /* Yellow border */
+            color: #ffe600 !important;  /* Yellow text */
+        }
+        
+        /* Form input field focus (when clicked) styling */
+        .form-control:focus {
+            border-color: #ffe600 !important;  /* Keep yellow border */
+            box-shadow: 0 0 0 0.2rem rgba(255, 230, 0, 0.25) !important;  /* Yellow glow */
+            background: rgba(42, 42, 42, 0.95) !important;  /* Slightly darker background */
+        }
+        
+        /* Dropdown menu styling */
+        .form-select {
+            background: rgba(42, 42, 42, 0.9) !important;  /* Dark background */
+            border: 2px solid #ffe600 !important;  /* Yellow border */
+            color: #ffe600 !important;  /* Yellow text */
+        }
+        
+        /* Dropdown menu focus styling */
+        .form-select:focus {
+            border-color: #ffe600 !important;
+            box-shadow: 0 0 0 0.2rem rgba(255, 230, 0, 0.25) !important;
+        }
+        
+        /* Card container styling */
+        .card {
+            background: rgba(42, 42, 42, 0.9) !important;  /* Dark background */
+            border: 2px solid #ffe600 !important;  /* Yellow border */
+            color: #ffe600 !important;  /* Yellow text */
+        }
+        
+        /* Card header styling */
+        .card-header {
+            background: linear-gradient(45deg, #ffe600, #ffed4e) !important;  /* Yellow gradient */
+            color: #2b2b2b !important;  /* Dark text */
+            font-weight: bold;
+            border-bottom: 2px solid #ffe600;  /* Yellow border at bottom */
+        }
+        
+        /* Muted text styling */
+        .text-muted {
+            color: #b3b3b3 !important;  /* Light gray text */
+        }
+        
+        /* Mobile menu button styling */
+        .navbar-toggler {
+            border: 2px solid #ffe600;  /* Yellow border */
+        }
+        
+        /* Mobile menu button icon */
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%23ffe600' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Fade in animation class */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;  /* Animation duration and style */
+        }
+        
+        /* Define the fade in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }  /* Start invisible and moved down */
+            to { opacity: 1; transform: translateY(0); }  /* End visible and in position */
         }
     </style>
+    <!-- Allow other templates to add their own CSS/JS -->
     {% block head %}{% endblock %}
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow">
+    <!-- Top navigation bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top shadow">
         <div class="container">
+            <!-- Brand/logo with link to home page -->
             <a class="navbar-brand" href="{{ url_for('index') }}">
                 <i class="fas fa-chart-line"></i> PrivAnalyzer
             </a>
+            <!-- Mobile menu toggle button -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
         </div>
     </nav>
 
-    <!-- Flash Messages -->
+    <!-- Container for flash messages (notifications) -->
     <div id="flash-messages"></div>
 
-    <!-- Main Content -->
-    <main class="container mt-4">
+    <!-- Main content area where other templates put their content -->
+    <main class="container mt-4 fade-in">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-dark text-light text-center py-3 mt-5">
+    <!-- Footer section -->
+    <footer class="text-light text-center py-3 mt-5">
         <div class="container">
             <p>&copy; 2024 PrivAnalyzer. Secure data processing with AI-powered queries.</p>
             <p>
                 <small>🔒 Your data is processed securely. Get your Groq API key at 
-                    <a href="https://console.groq.com" target="_blank" class="text-info text-decoration-underline">
+                    <a href="https://console.groq.com" target="_blank" class="text-decoration-underline">
                         console.groq.com
                     </a>
                 </small>
@@ -77,15 +276,20 @@
         </div>
     </footer>
 
-    <!-- Bootstrap 5 JS Bundle (includes Popper) -->
+    <!-- Import Bootstrap JavaScript for interactive features -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Flash Messages Script -->
+    <!-- JavaScript code for displaying flash messages -->
     <script>
+        // Wait for the page to fully load
         document.addEventListener('DOMContentLoaded', () => {
+            // Get the flash messages container
             const flashDiv = document.getElementById('flash-messages');
+            // Get messages from Flask backend (converted to JavaScript format)
             const messages = {{ get_flashed_messages() | tojson }};
+            // If there are messages to display
             if (messages.length > 0) {
+                // Create HTML for each message with close button
                 flashDiv.innerHTML = messages.map(msg => `
                     <div class="alert alert-info alert-dismissible fade show" role="alert">
                         ${msg}
@@ -96,6 +300,7 @@
         });
     </script>
 
+    <!-- Allow other templates to add their own JavaScript -->
     {% block scripts %}{% endblock %}
 </body>
 </html>
